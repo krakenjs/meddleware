@@ -1,7 +1,7 @@
 {
   "name": "meddleware",
   "version": "0.0.0",
-  "description": "express middleware orchestration",
+  "description": "Configuration-based middleware registration for express.",
   "main": "index.js",
   "directories": {
     "test": "test"
