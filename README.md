@@ -36,7 +36,7 @@ http.listen(app);
         "enabled": true,
         "priority": 30,
         "module": "./lib/middleware",
-        "factoryMethod": "customMiddleware"
+        "factoryMethod": "customMiddleware",
         "arguments": [ "foo", { "bar": "baz" } ]
     },
 
