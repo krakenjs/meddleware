@@ -51,23 +51,14 @@ http.listen(app);
 ```
 
 ##### Available Options
-`enabled (boolean)`
-true to enable middleware, false to disable. This option also supports enabling and disabling
-middleware at runtime.
+- `enabled` (*boolean*) - Set to `true` to enable middleware, `false` to disable. This option also supports enabling and disabling middleware at runtime.
 
-`priority (number)`
-The weight to give a particular piece of middleware when sorting for registration. Lower numbers
+- `priority` (*number*) - The weight to give a particular piece of middleware when sorting for registration. Lower numbers
 are registered first, while higher numbers are registered later. If `priority` is not a number, this setting defaults
 to `Number.MIN_VALUE`.
 
-`module (string)`
-The module to load containing the middleware implementation. Can be an installed module or a path to
-a module file within your project/application.
+- `module` (*string*) - The module to load containing the middleware implementation. Can be an installed module or a path to a module file within your project/application.
 
-`factoryMethod (string, optional)`
-The method on the provided module upon which invocation will create the middleware
-function to register. If a factory method is not provided, it defaults to the name of the current middleware being
-processed, and finally back to the module itself.
+- `factoryMethod` (*string*, optional) - The method on the provided module upon which invocation will create the middleware function to register. If a factory method is not provided, it defaults to the name of the current middleware being processed, and finally back to the module itself.
 
-`arguments (array, optional)`
-An array of arguments to pass to the middleware factory.
+- `arguments` (*array*, optional) - An array of arguments to pass to the middleware factory.
