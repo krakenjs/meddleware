@@ -50,7 +50,7 @@ http.listen(app);
 
 ```
 
-##### Available Options
+##### Options
 - `enabled` (*boolean*) - Set to `true` to enable middleware, `false` to disable. This option also supports enabling and disabling middleware at runtime.
 
 - `priority` (*number*) - The weight to give a particular piece of middleware when sorting for registration. Lower numbers
