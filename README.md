@@ -6,8 +6,7 @@ Configuration-based middleware registration for express.
 var http = require('http'),
     express = require('express'),
     meddleware = require('meddleware'),
-    shush = require('shush'),
-    config = shush('./config/middleware');
+    config = require('shush')('./config/middleware');
 
 var app = express();
 app.use(meddleware(config));
@@ -31,6 +30,21 @@ http.listen(app);
         "priority": 20,
         "module": "express",
         "arguments": [ "public" ]
+    },
+
+    "custom": {
+        "enabled": true,
+        "priority": 30,
+        "module": "./lib/middleware",
+        "factoryMethod": "customMiddleware"
+        "arguments": [ "foo", { "bar": "baz" } ]
+    },
+
+    "cookieParser": {
+        "enabled": false,
+        "priority": 40,
+        "module": "express",
+        "arguments": [ "keyboard cat" ]
     }
 }
 
