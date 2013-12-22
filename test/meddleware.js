@@ -6,7 +6,7 @@ var test = require('tape'),
     meddle = require('../');
 
 
-test('mottleware', function (t) {
+test('meddleware', function (t) {
 
     t.test('empty config', function (t) {
         var app;
@@ -37,7 +37,23 @@ test('mottleware', function (t) {
         t.end();
     });
 
+
+    t.test('mounting', function (t) {
+        var parent, child;
+
+        child = meddle(require('./fixtures/defaults'));
+        child.on('mount', function (parent) {
+            t.equal(parent.get('views'), child.get('views'));
+            t.end();
+        });
+
+        parent = express();
+        parent.set('views', './foo/bar');
+        parent.use(child);
+    });
+
 });
+
 
 test('priority', function (t) {
 
@@ -71,6 +87,47 @@ test('priority', function (t) {
 });
 
 
+test('module', function (t) {
+
+    t.test('module not defined', function (t) {
+        var config = {
+            "missing": {
+                "enabled": true,
+                "module": null
+            }
+        };
+
+        t.throws(function() {
+            try {
+                meddle(config);
+            } catch (e) {
+                t.ok(e instanceof TypeError);
+                t.equal(e.message, 'Module not defined.');
+                throw e;
+            }
+        });
+
+        t.end();
+    });
+
+
+    t.test('missing module', function (t) {
+        t.throws(function() {
+            try {
+                meddle(require('./fixtures/missing'));
+            } catch (e) {
+                t.ok(e instanceof TypeError);
+                t.ok(e.message.match(/^Module not found:/ig));
+                throw e;
+            }
+        });
+
+        t.end();
+    });
+
+});
+
+
 test('factories', function (t) {
 
     t.test('custom middleware factories', function (t) {
@@ -87,6 +144,23 @@ test('factories', function (t) {
             t.ok(handle.name);
             t.ok(handle.name.match(new RegExp(name, 'g')));
         });
+        t.end();
+    });
+
+
+    t.test('throw on invalid identifier', function (t) {
+        var config = require('./fixtures/invalid');
+
+        t.throws(function () {
+            try {
+                meddle(config);
+            } catch (e) {
+                t.ok(e instanceof SyntaxError);
+                t.equal(e.message, 'Invalid identifier.');
+                throw e;
+            }
+        }, SyntaxError);
+
         t.end();
     });
 

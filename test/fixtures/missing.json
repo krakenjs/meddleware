@@ -1,0 +1,7 @@
+{
+    "missing": {
+        "enabled": true,
+        "priority": 0,
+        "module": "./fixtures/middleware/missing"
+    }
+}

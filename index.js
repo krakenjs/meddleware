@@ -21,12 +21,23 @@ function isAbsolutePath(filename) {
 
 
 function resolveModule(filename, root) {
-    var module = tryResolve(filename);
+    var module;
+
+    if (!filename) {
+        throw new TypeError('Module not defined.');
+    }
+
+    module = tryResolve(filename);
     if (!module && !isAbsolutePath(filename)) {
         filename = path.resolve(root, filename);
         module = tryResolve(filename);
     }
-    return module && require(module);
+
+    if (!module) {
+        throw new TypeError('Module not found: ' + filename);
+    }
+
+    return require(module);
 }
 
 
@@ -51,10 +62,6 @@ function sort(a, b) {
 function findFactory(module, spec) {
     var factory;
 
-    if (!module) {
-        return module;
-    }
-
     factory = spec.factoryMethod;
     if (typeof module[factory] === 'function') {
         return module[factory];
@@ -69,16 +76,19 @@ function findFactory(module, spec) {
 }
 
 
-function createToggler(middleware, settings) {
+function createToggler(fn, settings) {
+    var name;
+
     function $impl(req, res, next) {
-        settings.enabled ? middleware(req, res, next) : next();
+        settings.enabled ? fn(req, res, next) : next();
     }
 
-    if (!/^[$_A-Za-z\xa0-\uffff][$_A-Za-z0-9\xa0-\uffff]*$/.test(middleware.name)) {
+    name = fn.name || settings.name;
+    if (!/^[$_A-Za-z\xa0-\uffff][$_A-Za-z0-9\xa0-\uffff]*$/.test(name)) {
         throw new SyntaxError('Invalid identifier.');
     }
 
-    return eval('(' + $impl.toString().replace('$impl', middleware.name) + ')');
+    return eval('(' + $impl.toString().replace('$impl', name) + ')');
 }
 
 

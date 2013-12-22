@@ -51,7 +51,7 @@ http.listen(app);
 ```
 
 ##### Available Options
-`enabled (boolean)`
+######`enabled` **(boolean)**
 true to enable middleware, false to disable. This option also supports enabling and disabling
 middleware at runtime.
 

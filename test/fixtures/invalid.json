@@ -1,0 +1,7 @@
+{
+    ".invalid.": {
+        "enabled": true,
+        "priority": 0,
+        "module": "./fixtures/middleware/anonymous"
+    }
+}
