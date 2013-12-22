@@ -1,0 +1,15 @@
+{
+    "demo": {
+        "enabled": true,
+        "priority": 50,
+        "module": "./fixtures/middleware/demo-factory",
+        "arguments": null
+    },
+    "demo2": {
+        "enabled": true,
+        "priority": 60,
+        "module": "./fixtures/middleware/demo-factory-method",
+        "factoryMethod": "demo2",
+        "arguments": null
+    }
+}

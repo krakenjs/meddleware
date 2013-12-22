@@ -1,0 +1,20 @@
+{
+    "logger": {
+        "enabled": true,
+        "priority": 1,
+        "module": "express",
+        "arguments": null
+    },
+
+    "favicon": {
+        "enabled": true,
+        "module": "express",
+        "arguments": null
+    },
+
+    "static": {
+        "enabled": true,
+        "module": "express",
+        "arguments": [ "path:./.build" ]
+    }
+}

@@ -1,0 +1,64 @@
+{
+    "favicon": {
+        "enabled": true,
+        "priority": 10,
+        "module": "express",
+        "arguments": null
+    },
+
+    "static": {
+        "enabled": true,
+        "priority": 30,
+        "module": "express",
+        "arguments": [ "path:./.build" ]
+    },
+
+    "logger": {
+        "enabled": true,
+        "priority": 50,
+        "module": "express",
+        "arguments": null
+    },
+
+    "json": {
+        "enabled": true,
+        "priority": 60,
+        "module": "express",
+        "arguments": null
+    },
+
+    "urlencoded": {
+        "enabled": true,
+        "priority": 70,
+        "module": "express",
+        "arguments": null
+    },
+
+    "cookieParser": {
+        "enabled": true,
+        "priority": 90,
+        "module": "express",
+        "arguments": [ "keyboard cat" ]
+    },
+
+    "session": {
+        "enabled": true,
+        "priority": 100,
+        "module": "express",
+        "arguments": [
+            {
+                "key": "",
+                "secret": "keyboard cat",
+                "cookie": {
+                    "path": "/",
+                    "httpOnly": true,
+                    "maxAge": null
+                },
+                "proxy": null
+            },
+            null,
+            null
+        ]
+    }
+
+}
