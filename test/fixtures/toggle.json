@@ -1,0 +1,20 @@
+{
+    "a": {
+        "enabled": true,
+        "priority": 0,
+        "module": "./fixtures/middleware/toggle",
+        "factoryMethod": "middlewareA"
+    },
+    "b": {
+        "enabled": true,
+        "priority": 1,
+        "module": "./fixtures/middleware/toggle",
+        "factoryMethod": "middlewareB"
+    },
+    "c": {
+        "enabled": true,
+        "priority": 2,
+        "module": "./fixtures/middleware/toggle",
+        "factoryMethod": "middlewareC"
+    }
+}
