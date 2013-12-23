@@ -74,8 +74,8 @@ was registered, and `spec` being the configuration object used in registering th
 ```javascript
 app = express();
 app.on('middleware:before', function (eventargs) {
-    console.log(spec.name); // depends on which middleware is about to be registered
-    // { app: [Object object], spec: [Object object] }
+    console.log(eventargs.spec.name); // depends on which middleware is about to be registered
+    // { app: [object Object], spec: [object Object] }
 });
 ```
 
@@ -85,8 +85,8 @@ was registered, and `spec` being the configuration object used in registering th
 ```javascript
 app = express();
 app.on('middleware:before:session', function (eventargs) {
-    console.log(spec.name); // 'session'
-    // { app: [Object object], spec: [Object object] }
+    console.log(eventargs.spec.name); // 'session'
+    // { app: [object Object], spec: [object Object] }
 });
 ```
 
@@ -96,8 +96,8 @@ was registered, and `spec` being the configuration object used in registering th
 ```javascript
 app = express();
 app.on('middleware:after', function (eventargs) {
-    console.log(spec.name); // depends on which middleware is about to be registered
-    // { app: [Object object], spec: [Object object] }
+    console.log(eventargs.spec.name); // depends on which middleware is about to be registered
+    // { app: [object Object], spec: [object Object] }
 });
 ```
 
@@ -107,7 +107,7 @@ was registered, and `spec` being the configuration object used in registering th
 ```javascript
 app = express();
 app.on('middleware:after:session', function (eventargs) {
-    console.log(spec.name); // session
-    // { app: [Object object], spec: [Object object] }
+    console.log(eventargs.spec.name); // session
+    // { app: [object Object], spec: [object Object] }
 });
 ```
