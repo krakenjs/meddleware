@@ -2,7 +2,8 @@
 
 var path = require('path'),
     caller = require('caller'),
-    express = require('express');
+    express = require('express'),
+    proxy = require('./lib/event-proxy');
 
 
 
@@ -77,6 +78,7 @@ function findFactory(module, spec) {
 
 
 function createToggler(fn, settings) {
+    /*jshint evil:true, multistr:true*/
     var name, impl;
 
     impl = "function $name(req, res, next) { \
@@ -94,7 +96,7 @@ function createToggler(fn, settings) {
 
 function registerer(app, root) {
     return function register(spec) {
-        var args, fn;
+        var args, fn, eventargs;
 
         args = spec['arguments'];
         args = Array.isArray(args) ? args.slice() : [];
@@ -103,10 +105,17 @@ function registerer(app, root) {
         fn = findFactory(fn, spec);
         fn = createToggler(fn.apply(null, args), spec);
 
-        app.emit('middleware:' + spec.name + ':before', app);
+        eventargs = {
+            app: app,
+            middleware: spec
+        };
+
+        app.emit('middleware:before', eventargs);
+        app.emit('middleware:before:' + spec.name, app);
         app.use(fn);
-        app.emit('middleware:' + spec.name + ':after', app);
-    }
+        app.emit('middleware:after:' + spec.name, app);
+        app.emit('middleware:after', eventargs);
+    };
 }
 
 
@@ -121,13 +130,13 @@ module.exports = function (settings) {
         // mounted apps, but config of mounted apps will be localized
         // to that app.
         app.settings = Object.create(parent.settings);
+        app = proxy.create(app, parent);
+
+        Object.keys(settings)
+            .map(namer(settings))
+            .sort(sort)
+            .forEach(registerer(app, root));
     });
-
-
-    Object.keys(settings)
-        .map(namer(settings))
-        .sort(sort)
-        .forEach(registerer(app, root));
 
     return app;
 };

@@ -12,9 +12,10 @@ test('meddleware', function (t) {
     t.test('empty config', function (t) {
         var app;
 
-        app = meddle(require('./fixtures/empty'));
+        app = express();
+        app.use(meddle(require('./fixtures/empty')));
 
-        t.equal(app.stack.length, 2, 'app middleware stack length is default length');
+        t.equal(app.stack.length, 3, 'app middleware stack length is default length');
         t.equal(app.stack[0].handle.name, 'query', 'middleware stack contains default "query" middleware');
         t.equal(app.stack[1].handle.name, 'expressInit', 'middleware stack contains default "expressInit" middleware');
         t.end();
@@ -22,16 +23,18 @@ test('meddleware', function (t) {
 
 
     t.test('built-in middleware config', function (t) {
-        var config, names, app;
+        var config, names, child, parent;
 
         config = require('./fixtures/defaults');
         names = Object.keys(config);
+        child = meddle(config);
 
-        app = meddle(config);
+        parent = express();
+        parent.use(child);
 
-        t.equal(app.stack.length, names.length + 2, 'middleware stack is appropriate length');
+        t.equal(child.stack.length, names.length + 2, 'middleware stack is appropriate length');
         names.forEach(function (name, i) {
-            var handle = app.stack[i + 2].handle;
+            var handle = child.stack[i + 2].handle;
             t.equal(typeof handle, 'function', 'middleware is correctly defined');
             t.ok(handle.name.match(new RegExp(name, 'g')), 'middleware name is correct');
         });
@@ -59,22 +62,25 @@ test('meddleware', function (t) {
 test('priority', function (t) {
 
     t.test('no priority', function (t) {
-        var config, app, entry;
+        var config, child, parent, entry;
 
         config = require('./fixtures/no-priority');
-        app = meddle(config);
+        child = meddle(config);
 
-        entry = app.stack[2];
+        parent = express();
+        parent.use(child);
+
+        entry = child.stack[2];
         t.ok(entry, 'position 2 middleware exists');
         t.equal(typeof entry.handle, 'function', 'position 2 middleware is a function');
         t.equal(entry.handle.name, 'favicon', 'position 2 middleware has the expected name');
 
-        entry = app.stack[3];
+        entry = child.stack[3];
         t.ok(entry, 'position 3 middleware exists');
         t.equal(typeof entry.handle, 'function', 'position 3 middleware is a function');
         t.equal(entry.handle.name, 'staticMiddleware', 'position 3 middleware has the expected name');
 
-        entry = app.stack[4];
+        entry = child.stack[4];
         t.ok(entry, 'position 4 middleware exists');
         t.equal(typeof entry.handle, 'function', 'position 4 middleware is a function');
         t.equal(entry.handle.name, 'logger', 'position 4 middleware has the expected name');
@@ -96,8 +102,10 @@ test('module', function (t) {
         };
 
         t.throws(function() {
+            var app;
             try {
-                meddle(config);
+                app = express();
+                app.use(meddle(config));
             } catch (e) {
                 t.ok(e instanceof TypeError, 'error is TypeError');
                 t.equal(e.message, 'Module not defined.', 'error message specifies module is not defined');
@@ -110,9 +118,11 @@ test('module', function (t) {
 
 
     t.test('missing module', function (t) {
+        var app;
         t.throws(function() {
             try {
-                meddle(require('./fixtures/missing'));
+                app = express();
+                app.use(meddle(require('./fixtures/missing')));
             } catch (e) {
                 t.ok(e instanceof TypeError, 'error is TypeError');
                 t.ok(e.message.match(/^Module not found:/ig), 'error message specified module is not found');
@@ -129,15 +139,18 @@ test('module', function (t) {
 test('factories', function (t) {
 
     t.test('custom middleware factories', function (t) {
-        var config, names, app;
+        var config, names, child, parent;
 
         config = require('./fixtures/factories');
         names = Object.keys(config);
-        app = meddle(config);
+        child = meddle(config);
 
-        t.equal(app.stack.length, names.length + 2, 'middleware stack is correct length');
+        parent = express();
+        parent.use(child);
+
+        t.equal(child.stack.length, names.length + 2, 'middleware stack is correct length');
         names.forEach(function (name, i) {
-            var handle = app.stack[i + 2].handle;
+            var handle = child.stack[i + 2].handle;
             t.equal(typeof handle, 'function', 'position ' + i + ' middleware is a function');
             t.ok(handle.name, 'position ' + i + ' middleware has a name');
             t.ok(handle.name.match(new RegExp(name, 'g')), 'position ' + i + ' middleware name matches ' + name);
@@ -147,11 +160,14 @@ test('factories', function (t) {
 
 
     t.test('throw on invalid identifier', function (t) {
-        var config = require('./fixtures/invalid');
+        var config, app;
+
+        config = require('./fixtures/invalid');
 
         t.throws(function () {
             try {
-                meddle(config);
+                app = express();
+                app.use(meddle(config));
             } catch (e) {
                 t.ok(e instanceof SyntaxError, 'error is SyntaxError');
                 t.equal(e.message, 'Invalid identifier.', 'error message specifies invalid identifier');
@@ -168,19 +184,21 @@ test('factories', function (t) {
 test('enabled', function (t) {
 
     t.test('only use enabled middleware', function (t) {
-        var config, names, app;
+        var config, names, child, parent;
 
         config = require('./fixtures/enabled');
         names = Object.keys(config).filter(function (prop) {
             return config[prop].enabled;
         });
 
-        app = meddle(config);
+        child = meddle(config);
+        parent = express();
+        parent.use(child);
 
-        t.equal(app.stack.length, 9, 'middleware stack is appropriate length');
+        t.equal(child.stack.length, 9, 'middleware stack is appropriate length');
 
         names.forEach(function (name, i) {
-            var handle = app.stack[i + 2].handle;
+            var handle = child.stack[i + 2].handle;
             t.equal(typeof handle, 'function', 'position ' + i + ' middleware is a function');
             t.ok(handle.name, 'position ' + i + ' middleware has a name');
             t.ok(handle.name.match(new RegExp(name, 'g')), 'position ' + i + ' middleware name matches ' + name);
@@ -230,6 +248,25 @@ test('enabled', function (t) {
             });
         });
 
+    });
+
+});
+
+
+test('events', function (t) {
+
+    t.test('before and after registration events', function (t) {
+        var config, app, events = 0;
+
+        config = require('./fixtures/defaults');
+        app = express();
+        app.on('middleware:before', function (eventargs) {
+            events += 1;
+        });
+
+        app.use(meddle(config));
+        t.equal(events, 7, 'registration events were triggered');
+        t.end();
     });
 
 });

@@ -62,3 +62,6 @@ to `Number.MIN_VALUE`.
 - `factoryMethod` (*string*, optional) - The method on the provided module upon which invocation will create the middleware function to register. If a factory method is not provided, it defaults to the name of the current middleware being processed, and finally back to the module itself.
 
 - `arguments` (*array*, optional) - An array of arguments to pass to the middleware factory.
+
+##### express App Events
+Along with registration

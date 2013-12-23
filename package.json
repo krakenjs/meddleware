@@ -8,7 +8,8 @@
   },
   "scripts": {
     "test": "tape test/*.js",
-    "cover": "istanbul cover tape -- test/*.js"
+    "cover": "istanbul cover tape -- test/*.js",
+    "lint": "jshint -c .jshintrc index.js lib/event-proxy.js"
   },
   "keywords": [
     "express",
@@ -20,7 +21,8 @@
     "tape": "~2.3.2",
     "express": "~3.4.7",
     "istanbul": "~0.2.1",
-    "supertest": "~0.8.2"
+    "supertest": "~0.8.2",
+    "jshint": "~2.3.0"
   },
   "dependencies": {
     "caller": "0.0.1"
