@@ -107,24 +107,24 @@ function registerer(app, root) {
 
         eventargs = {
             app: app,
-            middleware: spec
+            spec: spec
         };
 
         app.emit('middleware:before', eventargs);
-        app.emit('middleware:before:' + spec.name, app);
+        app.emit('middleware:before:' + spec.name, eventargs);
         app.use(fn);
-        app.emit('middleware:after:' + spec.name, app);
+        app.emit('middleware:after:' + spec.name, eventargs);
         app.emit('middleware:after', eventargs);
     };
 }
 
 
-module.exports = function (settings) {
+module.exports = function meddleware(settings) {
     var root, app;
 
     root = path.dirname(caller());
     app = express();
-    app.once('mount', function (parent) {
+    app.once('mount', function onmount(parent) {
         // Reset all mounted app settings to inherit from parent.
         // This way, all changes to parent will be picked up by
         // mounted apps, but config of mounted apps will be localized

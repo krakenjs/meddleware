@@ -63,5 +63,46 @@ to `Number.MIN_VALUE`.
 
 - `arguments` (*array*, optional) - An array of arguments to pass to the middleware factory.
 
+
 ##### express App Events
-Along with registration
+Along with registration, consumers can be notified of registration events. There are 4 types of events one can subscribe to:
+
+- 'middleware:before' - Subscribe to this event to be notified immediately before every middleware registration. The event handler
+will receive an eventargs object containing 2 properties: `app` being the express application against which the middleware
+was registered, and `spec` being the configuration object used in registering the middleware.
+```javascript
+app = express();
+app.on('middleware:before', function (eventargs) {
+    // { app: [Object object], spec: [Object object] }
+});
+```
+
+- 'middleware:after' - Subscribe to this event to be notified immediately after every middleware registration. The event handler
+will receive an eventargs object containing 2 properties: `app` being the express application against which the middleware
+was registered, and `spec` being the configuration object used in registering the middleware.
+```javascript
+app = express();
+app.on('middleware:before', function (eventargs) {
+    // { app: [Object object], spec: [Object object] }
+});
+```
+
+- 'middleware:before:{name}' - Subscribe to this event to be notified immediately before registration of the named middleware. The event handler
+will receive an eventargs object containing 2 properties: `app` being the express application against which the middleware
+was registered, and `spec` being the configuration object used in registering the middleware.
+```javascript
+app = express();
+app.on('middleware:before', function (eventargs) {
+    // { app: [Object object], spec: [Object object] }
+});
+```
+
+- 'middleware:after:{name}' - Subscribe to this event to be notified immediately after registration of the named middleware. The event handler
+will receive an eventargs object containing 2 properties: `app` being the express application against which the middleware
+was registered, and `spec` being the configuration object used in registering the middleware.
+```javascript
+app = express();
+app.on('middleware:before', function (eventargs) {
+    // { app: [Object object], spec: [Object object] }
+});
+```
