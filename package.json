@@ -9,7 +9,7 @@
   "scripts": {
     "test": "tape test/*.js",
     "cover": "istanbul cover tape -- test/*.js",
-    "lint": "jshint -c .jshintrc index.js lib/event-proxy.js"
+    "lint": "jshint -c .jshintrc index.js"
   },
   "keywords": [
     "express",

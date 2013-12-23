@@ -260,12 +260,41 @@ test('events', function (t) {
 
         config = require('./fixtures/defaults');
         app = express();
-        app.on('middleware:before', function (eventargs) {
+
+        app.on('middleware:before', function () {
+            events += 1;
+        });
+
+        app.on('middleware:after', function () {
             events += 1;
         });
 
         app.use(meddle(config));
-        t.equal(events, 7, 'registration events were triggered');
+        t.equal(events, 14, 'registration events were triggered');
+        t.end();
+    });
+
+
+    t.test('before and after named registration events', function (t) {
+        var config, events, child, parent;
+
+        config = require('./fixtures/defaults');
+        events = 0;
+        child = meddle(config);
+        parent = express();
+
+        parent.on('middleware:before:favicon', function (eventargs) {
+            t.equal(eventargs.app, child);
+            events += 1;
+        });
+
+        parent.on('middleware:after:favicon', function (eventargs) {
+            t.equal(eventargs.app, child);
+            events += 1;
+        });
+
+        parent.use(child);
+        t.equal(events, 2, 'registration events were triggered');
         t.end();
     });
 

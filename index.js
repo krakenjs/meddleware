@@ -2,11 +2,14 @@
 
 var path = require('path'),
     caller = require('caller'),
-    express = require('express'),
-    proxy = require('./lib/event-proxy');
+    express = require('express');
 
 
-
+/**
+ * Determines if node is able to resolve the provided module file.
+ * @param module The file path to the desired module.
+ * @returns {*} The absolute path to the module or `undefined` if not found.
+ */
 function tryResolve(module) {
     try {
         return require.resolve(module);
@@ -16,42 +19,64 @@ function tryResolve(module) {
 }
 
 
-function isAbsolutePath(filename) {
-    return path.resolve(filename) === filename;
+/**
+ * Determines if the provided argument is an absolute file path.
+ * @param file The path in question.
+ * @returns {boolean} `true` if the file path is absolute, `false` if not.
+ */
+function isAbsolutePath(file) {
+    return path.resolve(file) === file;
 }
 
 
-function resolveModule(filename, root) {
+/**
+ * Attempts to locate a node module based on file and root directory.
+ * @param file The file path (absolute or relative) for which to look up the module.
+ * @param root The root directory to resolve to if file is a relative path.
+ * @returns {*} The desired module, if located.
+ */
+function resolveModule(file, root) {
     var module;
 
-    if (!filename) {
+    if (!file) {
         throw new TypeError('Module not defined.');
     }
 
-    module = tryResolve(filename);
-    if (!module && !isAbsolutePath(filename)) {
-        filename = path.resolve(root, filename);
-        module = tryResolve(filename);
+    module = tryResolve(file);
+    if (!module && !isAbsolutePath(file)) {
+        file = path.resolve(root, file);
+        module = tryResolve(file);
     }
 
     if (!module) {
-        throw new TypeError('Module not found: ' + filename);
+        throw new TypeError('Module not found: ' + file);
     }
 
     return require(module);
 }
 
-
-function namer(settings) {
+/**
+ * A factory function that creates a handler which will add a property called `name` to the object
+ * located at property `name` on a parent object.
+ * @param parent The parent object containing the named property in question.
+ * @returns {Function} The handler used to do the renaming.
+ */
+function namer(parent) {
     return function name(key) {
         var spec;
-        spec = settings[key];
+        spec = parent[key];
         spec.name = key;
         return spec;
     };
 }
 
 
+/**
+ * Sort implementation for objects with a numeric `proiority` property.
+ * @param a
+ * @param b
+ * @returns {number}
+ */
 function sort(a, b) {
     var ap, bp;
     ap = typeof a.priority === 'number' ? a.priority : Number.MIN_VALUE;
@@ -60,15 +85,21 @@ function sort(a, b) {
 }
 
 
-function findFactory(module, spec) {
+/**
+ * Attempt to resolve a method on the provided module.
+ * @param module The module in question.
+ * @param settings The settings object containing info related to method lookup.
+ * @returns {*} The factory method
+ */
+function resolveFactory(module, settings) {
     var factory;
 
-    factory = spec.factoryMethod;
+    factory = settings.factoryMethod;
     if (typeof module[factory] === 'function') {
         return module[factory];
     }
 
-    factory = spec.name;
+    factory = settings.name;
     if (typeof module[factory] === 'function') {
         return module[factory];
     }
@@ -77,7 +108,13 @@ function findFactory(module, spec) {
 }
 
 
-function createToggler(fn, settings) {
+/**
+ * Creates a middleware wrapper for toggling whether the middleware is enabled or disabled at runtime.
+ * @param fn the original middleware implementation.
+ * @param settings The settings object containing info related to creating an appropriate wrapper.
+ * @returns {Object}
+ */
+function createToggleWrapper(fn, settings) {
     /*jshint evil:true, multistr:true*/
     var name, impl;
 
@@ -94,7 +131,18 @@ function createToggler(fn, settings) {
 }
 
 
-function registerer(app, root) {
+/**
+ * A factory function used to create the middleware registration implementation.
+ * @param app The app against which middleware will be registered.
+ * @param root The root directory used for resolving modules, etc.
+ * @returns {Function}
+ */
+function register(app, root) {
+    var parent;
+
+    // Wrap app such that events can be propagated to the parent.
+    parent = app.parent;
+
     return function register(spec) {
         var args, fn, eventargs;
 
@@ -102,41 +150,49 @@ function registerer(app, root) {
         args = Array.isArray(args) ? args.slice() : [];
 
         fn = resolveModule(spec.module, root);
-        fn = findFactory(fn, spec);
-        fn = createToggler(fn.apply(null, args), spec);
+        fn = resolveFactory(fn, spec);
+        fn = createToggleWrapper(fn.apply(null, args), spec);
 
+        // prototype business is because we had to wrap app
+        //
         eventargs = {
             app: app,
             spec: spec
         };
 
-        app.emit('middleware:before', eventargs);
-        app.emit('middleware:before:' + spec.name, eventargs);
+        parent.emit('middleware:before', eventargs);
+        parent.emit('middleware:before:' + spec.name, eventargs);
         app.use(fn);
-        app.emit('middleware:after:' + spec.name, eventargs);
-        app.emit('middleware:after', eventargs);
+        parent.emit('middleware:after:' + spec.name, eventargs);
+        parent.emit('middleware:after', eventargs);
     };
 }
+
 
 
 module.exports = function meddleware(settings) {
     var root, app;
 
+    // The `require`-ing module (caller) is considered the `root`
+    // against which relative file paths will be resolved.
+    // Don't like it? Then pass absolute module paths. :D
     root = path.dirname(caller());
-    app = express();
-    app.once('mount', function onmount(parent) {
+
+    function onmount(parent) {
         // Reset all mounted app settings to inherit from parent.
         // This way, all changes to parent will be picked up by
         // mounted apps, but config of mounted apps will be localized
         // to that app.
         app.settings = Object.create(parent.settings);
-        app = proxy.create(app, parent);
 
+        // Process teh middlewarez
         Object.keys(settings)
             .map(namer(settings))
             .sort(sort)
-            .forEach(registerer(app, root));
-    });
+            .forEach(register(app, root));
+    }
 
+    app = express();
+    app.once('mount', onmount);
     return app;
 };
