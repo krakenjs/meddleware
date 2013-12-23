@@ -73,16 +73,7 @@ was registered, and `spec` being the configuration object used in registering th
 ```javascript
 app = express();
 app.on('middleware:before', function (eventargs) {
-    // { app: [Object object], spec: [Object object] }
-});
-```
-
-- 'middleware:after' - Subscribe to this event to be notified immediately after every middleware registration. The event handler
-will receive an eventargs object containing 2 properties: `app` being the express application against which the middleware
-was registered, and `spec` being the configuration object used in registering the middleware.
-```javascript
-app = express();
-app.on('middleware:before', function (eventargs) {
+    console.log(spec.name); // depends on which middleware is about to be registered
     // { app: [Object object], spec: [Object object] }
 });
 ```
@@ -92,7 +83,19 @@ will receive an eventargs object containing 2 properties: `app` being the expres
 was registered, and `spec` being the configuration object used in registering the middleware.
 ```javascript
 app = express();
-app.on('middleware:before', function (eventargs) {
+app.on('middleware:before:session', function (eventargs) {
+    console.log(spec.name); // 'session'
+    // { app: [Object object], spec: [Object object] }
+});
+```
+
+- 'middleware:after' - Subscribe to this event to be notified immediately after every middleware registration. The event handler
+will receive an eventargs object containing 2 properties: `app` being the express application against which the middleware
+was registered, and `spec` being the configuration object used in registering the middleware.
+```javascript
+app = express();
+app.on('middleware:after', function (eventargs) {
+    console.log(spec.name); // depends on which middleware is about to be registered
     // { app: [Object object], spec: [Object object] }
 });
 ```
@@ -102,7 +105,8 @@ will receive an eventargs object containing 2 properties: `app` being the expres
 was registered, and `spec` being the configuration object used in registering the middleware.
 ```javascript
 app = express();
-app.on('middleware:before', function (eventargs) {
+app.on('middleware:after:session', function (eventargs) {
+    console.log(spec.name); // session
     // { app: [Object object], spec: [Object object] }
 });
 ```
