@@ -77,18 +77,18 @@ function findFactory(module, spec) {
 
 
 function createToggler(fn, settings) {
-    var name;
+    var name, impl;
 
-    function $impl(req, res, next) {
-        settings.enabled ? fn(req, res, next) : next();
-    }
+    impl = "function $name(req, res, next) { \
+        settings.enabled ? fn(req, res, next) : next(); \
+    }";
 
     name = fn.name || settings.name;
     if (!/^[$_A-Za-z\xa0-\uffff][$_A-Za-z0-9\xa0-\uffff]*$/.test(name)) {
         throw new SyntaxError('Invalid identifier.');
     }
 
-    return eval('(' + $impl.toString().replace('$impl', name) + ')');
+    return eval('(' + impl.replace('$name', name) + ')');
 }
 
 
