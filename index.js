@@ -153,16 +153,14 @@ function register(app, root) {
         fn = resolveFactory(fn, spec);
         fn = createToggleWrapper(fn.apply(null, args), spec);
 
-        // prototype business is because we had to wrap app
-        //
         eventargs = {
             app: app,
-            spec: spec
+            settings: spec
         };
 
         parent.emit('middleware:before', eventargs);
         parent.emit('middleware:before:' + spec.name, eventargs);
-        app.use(fn);
+        typeof spec.route === 'string' ? app.use(spec.route, fn) : app.use(fn);
         parent.emit('middleware:after:' + spec.name, eventargs);
         parent.emit('middleware:after', eventargs);
     };

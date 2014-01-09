@@ -11,5 +11,11 @@
         "module": "./fixtures/middleware/demo-factory-method",
         "factoryMethod": "demo2",
         "arguments": null
+    },
+    "demo3": {
+        "enabled": true,
+        "priority": 70,
+        "module": "./fixtures/middleware/demo-factory-method",
+        "arguments": null
     }
 }

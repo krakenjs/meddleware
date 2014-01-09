@@ -1,0 +1,24 @@
+{
+    "routeA": {
+        "enabled": true,
+        "priority": 50,
+        "module": "./fixtures/middleware/routes",
+        "route": "/foo",
+        "arguments": null
+    },
+
+    "routeB": {
+        "enabled": true,
+        "priority": 60,
+        "module": "./fixtures/middleware/routes",
+        "arguments": null
+    },
+
+    "routeC": {
+        "enabled": true,
+        "priority": 70,
+        "module": "./fixtures/middleware/routes",
+        "route": "/bar",
+        "arguments": null
+    }
+}

@@ -299,3 +299,64 @@ test('events', function (t) {
     });
 
 });
+
+
+test('routes', function (t) {
+
+    t.test('route-specific middleware', function (t) {
+        var config, app;
+
+        function req(route, cb) {
+            var server;
+            server = request(app)
+                .get(route)
+                .end(function (err, res) {
+
+                    t.error(err, 'no response error');
+                    t.equal(typeof res, 'object', 'response is defined');
+                    t.equal(typeof res.body, 'object', 'response body is defined');
+
+                    server.app.close(function () {
+                        cb(res.body);
+                    });
+                });
+        }
+
+        config = require('./fixtures/routes');
+
+        app = express();
+        app.use(meddle(config));
+
+        app.get('/', function (req, res) {
+            t.notOk(res.locals.routeA);
+            t.ok(res.locals.routeB);
+            t.notOk(res.locals.routeC);
+            res.send(200);
+        });
+
+        app.get('/foo', function (req, res) {
+            t.ok(res.locals.routeA);
+            t.ok(res.locals.routeB);
+            t.notOk(res.locals.routeC);
+            res.send(200);
+        });
+
+        app.get('/bar', function (req, res) {
+            t.notOk(res.locals.routeA);
+            t.ok(res.locals.routeB);
+            t.ok(res.locals.routeC);
+            res.send(200);
+        });
+
+        // trololol
+        req('/', function () {
+            req('/foo', function () {
+                req('/bar', function () {
+                    t.end();
+                });
+            });
+        });
+
+    });
+
+});
