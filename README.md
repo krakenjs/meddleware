@@ -122,3 +122,14 @@ app.on('middleware:after', function (eventargs) {
 
 app.use(meddle(config));
 ```
+
+
+#### Tests
+```bash
+$ npm test
+```
+
+#### Coverage
+````bash
+$ npm run-script cover && open coverage/lcov-report/index.html
+```
