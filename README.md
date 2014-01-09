@@ -63,6 +63,8 @@ to `Number.MIN_VALUE`.
 
 - `arguments` (*array*, optional) - An array of arguments to pass to the middleware factory.
 
+- `route` (*string*, optional) - An express route against which the middleware should be run.
+
 
 #### Express App Events
 Along with registration, consumers can be notified of registration events. **NOTE: These events are *only* triggered for
