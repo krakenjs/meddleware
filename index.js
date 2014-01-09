@@ -138,12 +138,9 @@ function createToggleWrapper(fn, settings) {
  * @returns {Function}
  */
 function register(app, root) {
-    var parent;
+    var parent = app.parent;
 
-    // Wrap app such that events can be propagated to the parent.
-    parent = app.parent;
-
-    return function register(spec) {
+    return function registrar(spec) {
         var args, fn, eventargs;
 
         args = spec['arguments'];
