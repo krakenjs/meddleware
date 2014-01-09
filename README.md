@@ -73,7 +73,7 @@ the middleware that is registered via `meddleware`.** All middleware event recei
 ```javascript
 {
    app: [object Object], // express app
-   spec: [object Object] // object for the current middleware as read from provided configuration
+   config: [object Object] // config object for the current middleware
 }
 ```
 There are 4 types of events one can subscribe to:

@@ -152,7 +152,7 @@ function register(app, root) {
 
         eventargs = {
             app: app,
-            settings: spec
+            config: spec
         };
 
         parent.emit('middleware:before', eventargs);
