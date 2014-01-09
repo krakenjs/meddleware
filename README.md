@@ -35,6 +35,7 @@ http.listen(app);
     "custom": {
         "enabled": true,
         "priority": 30,
+        "route": "/foo",
         "module": "./lib/middleware",
         "factoryMethod": "customMiddleware",
         "arguments": [ "foo", { "bar": "baz" } ]
@@ -63,7 +64,7 @@ to `Number.MIN_VALUE`.
 
 - `arguments` (*array*, optional) - An array of arguments to pass to the middleware factory.
 
-- `route` (*string*, optional) - An express route against which the middleware should be run.
+- `route` (*string*, optional) - An express route against which the middleware should be registered.
 
 
 #### Express App Events
