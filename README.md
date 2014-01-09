@@ -69,7 +69,7 @@ to `Number.MIN_VALUE`.
 
 #### Express App Events
 Along with registration, consumers can be notified of registration events. **NOTE: These events are *only* triggered for
-the middleware that is registered via `meddleware`.** All middleware event receive the following eventargs object:
+the middleware that is registered via `meddleware`.** All middleware events receive the following eventargs object:
 ```javascript
 {
    app: [object Object], // express app
