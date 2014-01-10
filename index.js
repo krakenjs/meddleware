@@ -196,6 +196,7 @@ module.exports = function meddleware(settings) {
         // mounted apps, but config of mounted apps will be localized
         // to that app.
         app.settings = Object.create(parent.settings);
+        app.engines = Object.create(app.engines);
 
         // Process teh middlewarez
         Object.keys(settings)
