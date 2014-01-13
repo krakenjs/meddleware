@@ -22,6 +22,10 @@ var path = require('path'),
     express = require('express');
 
 
+function isExpress(obj) {
+    return obj.handle && obj.set;
+}
+
 /**
  * Determines if node is able to resolve the provided module file.
  * @param module The file path to the desired module.
@@ -134,6 +138,11 @@ function resolveFactory(module, settings) {
 function createToggleWrapper(fn, settings) {
     /*jshint evil:true, multistr:true*/
     var name, impl;
+
+    // Do not wrap express objects
+    if (isExpress(fn)) {
+        return fn;
+    }
 
     impl = "function $name(req, res, next) { \
         settings.enabled ? fn(req, res, next) : next(); \

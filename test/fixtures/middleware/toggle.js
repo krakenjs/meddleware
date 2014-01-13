@@ -1,5 +1,6 @@
 'use strict';
 
+var express = require('express');
 
 exports.middlewareA = function () {
     return function middlewareA(req, res, next) {
@@ -19,4 +20,8 @@ exports.middlewareC = function () {
     return function middlewareC(req, res) {
         res.json({ a: res.locals.a, b:  res.locals.b });
     };
+};
+
+exports.middlewareD = function () {
+    return express();
 };

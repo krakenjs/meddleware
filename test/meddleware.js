@@ -250,6 +250,23 @@ test('enabled', function (t) {
 
     });
 
+
+    t.test('ignore express objects', function (t) {
+        var config, parent, child;
+
+        config = require('./fixtures/toggle');
+        child = meddle(config);
+        parent = express();
+        parent.use(child);
+
+        // The final middleware for both child and parent should be the anonymous
+        // wrapper created for express objects. Otherwise, middleware should be
+        // the named wrapper.
+        t.strictEqual(child.stack[child.stack.length - 1].handle.name, '');
+        t.strictEqual(parent.stack[parent.stack.length - 1].handle.name, '');
+        t.end();
+    });
+
 });
 
 

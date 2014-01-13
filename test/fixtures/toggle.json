@@ -16,5 +16,11 @@
         "priority": 2,
         "module": "./fixtures/middleware/toggle",
         "factoryMethod": "middlewareC"
+    },
+    "d": {
+        "enabled": true,
+        "priority": 2,
+        "module": "./fixtures/middleware/toggle",
+        "factoryMethod": "middlewareD"
     }
 }
