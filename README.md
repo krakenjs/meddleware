@@ -10,7 +10,7 @@ var http = require('http'),
 
 var app = express();
 app.use(meddleware(config));
-http.listen(app);
+http.createServer(app).listen(8080);
 
 ```
 
