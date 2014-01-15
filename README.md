@@ -80,22 +80,22 @@ There are 4 types of events one can subscribe to:
 
 - `middleware:before` - Subscribe to this event to be notified immediately before every middleware registration. The event handler
 will receive an eventargs object containing 2 properties: `app` being the express application against which the middleware
-was registered, and `spec` being the configuration object used in registering the middleware.
+was registered, and `config` being the configuration object used in registering the middleware.
 
 
 - `middleware:before:{name}` - Subscribe to this event to be notified immediately before registration of the named middleware. The event handler
 will receive an eventargs object containing 2 properties: `app` being the express application against which the middleware
-was registered, and `spec` being the configuration object used in registering the middleware.
+was registered, and `config` being the configuration object used in registering the middleware.
 
 
 - `middleware:after` - Subscribe to this event to be notified immediately after every middleware registration. The event handler
 will receive an eventargs object containing 2 properties: `app` being the express application against which the middleware
-was registered, and `spec` being the configuration object used in registering the middleware.
+was registered, and `config` being the configuration object used in registering the middleware.
 
 
 - `middleware:after:{name}` - Subscribe to this event to be notified immediately after registration of the named middleware. The event handler
 will receive an eventargs object containing 2 properties: `app` being the express application against which the middleware
-was registered, and `spec` being the configuration object used in registering the middleware.
+was registered, and `config` being the configuration object used in registering the middleware.
 
 ```javascript
 var express = require('express'),
@@ -105,19 +105,19 @@ var express = require('express'),
 app = express();
 
 app.on('middleware:before', function (eventargs) {
-    console.log(eventargs.spec.name); // depends on which middleware is about to be registered
+    console.log(eventargs.config.name); // depends on which middleware is about to be registered
 });
 
 app.on('middleware:before:session', function (eventargs) {
-    console.log(eventargs.spec.name); // 'session'
+    console.log(eventargs.config.name); // 'session'
 });
 
 app.on('middleware:after:session', function (eventargs) {
-    console.log(eventargs.spec.name); // session
+    console.log(eventargs.config.name); // session
 });
 
 app.on('middleware:after', function (eventargs) {
-    console.log(eventargs.spec.name); // depends on which middleware is about to be registered
+    console.log(eventargs.config.name); // depends on which middleware is about to be registered
 });
 
 app.use(meddle(config));
