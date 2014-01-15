@@ -1,43 +1,44 @@
 {
-    "name": "meddleware",
-    "version": "0.0.0",
-    "description": "Configuration-based middleware registration for express.",
-    "main": "index.js",
-    "directories": {
-        "test": "test"
-    },
-    "scripts": {
-        "test": "tape test/*.js",
-        "cover": "istanbul cover tape -- test/*.js",
-        "lint": "jshint -c .jshintrc index.js"
-    },
-    "keywords": [
-        "express",
-        "middleware"
-    ],
-    "author": "Erik Toth <ertoth@paypal.com>",
-    "licenses": [
-        {
-            "type": "Apache 2.0",
-            "url": "http://www.apache.org/licenses/LICENSE-2.0.html"
-        }
-    ],
-    "devDependencies": {
-        "tape": "~2.3.2",
-        "express": "~3.4.7",
-        "istanbul": "~0.2.1",
-        "supertest": "~0.8.2",
-        "jshint": "~2.3.0"
-    },
-    "dependencies": {
-        "caller": "0.0.1"
-    },
-    "repository": {
-        "type": "git",
-        "url": "git://github.com/paypal/meddleware.git"
-    },
-    "bugs": {
-        "url": "https://github.com/paypal/meddleware/issues"
-    },
-    "homepage": "https://github.com/paypal/meddleware"
+  "name": "meddleware",
+  "version": "0.0.0",
+  "description": "Configuration-based middleware registration for express.",
+  "main": "index.js",
+  "directories": {
+    "test": "test"
+  },
+  "scripts": {
+    "test": "tape test/*.js",
+    "cover": "istanbul cover tape -- test/*.js",
+    "lint": "jshint -c .jshintrc index.js"
+  },
+  "keywords": [
+    "express",
+    "middleware"
+  ],
+  "author": "Erik Toth <ertoth@paypal.com>",
+  "licenses": [
+    {
+      "type": "Apache 2.0",
+      "url": "http://www.apache.org/licenses/LICENSE-2.0.html"
+    }
+  ],
+  "devDependencies": {
+    "tape": "~2.3.2",
+    "express": "~3.4.7",
+    "istanbul": "~0.2.1",
+    "supertest": "~0.8.2",
+    "jshint": "~2.3.0"
+  },
+  "dependencies": {
+    "caller": "0.0.1",
+    "cellophane": "0.0.2"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/paypal/meddleware.git"
+  },
+  "bugs": {
+    "url": "https://github.com/paypal/meddleware/issues"
+  },
+  "homepage": "https://github.com/paypal/meddleware"
 }

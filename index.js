@@ -19,7 +19,7 @@
 
 var path = require('path'),
     caller = require('caller'),
-    express = require('express');
+    cellophane = require('cellophane');
 
 
 function isExpress(obj) {
@@ -164,8 +164,6 @@ function createToggleWrapper(fn, settings) {
  * @returns {Function}
  */
 function register(app, root) {
-    var parent = app.parent;
-
     return function registrar(spec) {
         var args, fn, eventargs;
 
@@ -181,11 +179,11 @@ function register(app, root) {
             config: spec
         };
 
-        parent.emit('middleware:before', eventargs);
-        parent.emit('middleware:before:' + spec.name, eventargs);
+        app.emit('middleware:before', eventargs);
+        app.emit('middleware:before:' + spec.name, eventargs);
         typeof spec.route === 'string' ? app.use(spec.route, fn) : app.use(fn);
-        parent.emit('middleware:after:' + spec.name, eventargs);
-        parent.emit('middleware:after', eventargs);
+        app.emit('middleware:after:' + spec.name, eventargs);
+        app.emit('middleware:after', eventargs);
     };
 }
 
@@ -200,13 +198,6 @@ module.exports = function meddleware(settings) {
     root = path.dirname(caller());
 
     function onmount(parent) {
-        // Reset all mounted app settings to inherit from parent.
-        // This way, all changes to parent will be picked up by
-        // mounted apps, but config of mounted apps will be localized
-        // to that app.
-        app.settings = Object.create(parent.settings);
-        app.engines = Object.create(parent.engines);
-
         // Process teh middlewarez
         Object.keys(settings)
             .map(namer(settings))
@@ -214,7 +205,7 @@ module.exports = function meddleware(settings) {
             .forEach(register(app, root));
     }
 
-    app = express();
+    app = cellophane();
     app.once('mount', onmount);
     return app;
 };
