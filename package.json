@@ -30,7 +30,8 @@
     "jshint": "~2.3.0"
   },
   "dependencies": {
-    "caller": "0.0.1"
+    "caller": "0.0.1",
+    "debuglog": "0.0.2"
   },
   "repository": {
     "type": "git",

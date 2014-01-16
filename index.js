@@ -19,7 +19,8 @@
 
 var path = require('path'),
     caller = require('caller'),
-    express = require('express');
+    express = require('express'),
+    debug = require('debuglog')('meddleware');
 
 
 function isExpress(obj) {
@@ -73,6 +74,7 @@ function resolveModule(file, root) {
         throw new TypeError('Module not found: ' + file);
     }
 
+    debug('loading module', module);
     return require(module);
 }
 
@@ -178,6 +180,8 @@ function register(app, root) {
             app: app,
             config: spec
         };
+
+        debug('registering', spec.name, 'middleware');
 
         app.emit('middleware:before', eventargs);
         app.emit('middleware:before:' + spec.name, eventargs);
