@@ -15,7 +15,7 @@ test('meddleware', function (t) {
         app = express();
         app.use(meddle(require('./fixtures/empty')));
 
-        t.equal(app.stack.length, 3, 'app middleware stack length is default length');
+        t.equal(app.stack.length, 2, 'app middleware stack length is default length');
         t.equal(app.stack[0].handle.name, 'query', 'middleware stack contains default "query" middleware');
         t.equal(app.stack[1].handle.name, 'expressInit', 'middleware stack contains default "expressInit" middleware');
         t.end();
@@ -23,37 +23,21 @@ test('meddleware', function (t) {
 
 
     t.test('built-in middleware config', function (t) {
-        var config, names, child, parent;
+        var config, names, app;
 
         config = require('./fixtures/defaults');
         names = Object.keys(config);
-        child = meddle(config);
 
-        parent = express();
-        parent.use(child);
+        app = express();
+        app.use(meddle(config));
 
-        t.equal(child.stack.length, names.length + 2, 'middleware stack is appropriate length');
+        t.equal(app.stack.length, names.length + 2, 'middleware stack is appropriate length');
         names.forEach(function (name, i) {
-            var handle = child.stack[i + 2].handle;
+            var handle = app.stack[i + 2].handle;
             t.equal(typeof handle, 'function', 'middleware is correctly defined');
             t.ok(handle.name.match(new RegExp(name, 'g')), 'middleware name is correct');
         });
         t.end();
-    });
-
-
-    t.test('mounting', function (t) {
-        var parent, child;
-
-        child = meddle(require('./fixtures/defaults'));
-        child.on('mount', function (parent) {
-            t.equal(parent.get('views'), child.get('views'), 'child app inherits parent settings');
-            t.end();
-        });
-
-        parent = express();
-        parent.set('views', './foo/bar');
-        parent.use(child);
     });
 
 });
@@ -62,25 +46,23 @@ test('meddleware', function (t) {
 test('priority', function (t) {
 
     t.test('no priority', function (t) {
-        var config, child, parent, entry;
+        var config, app, entry;
 
         config = require('./fixtures/no-priority');
-        child = meddle(config);
+        app = express();
+        app.use(meddle(config));
 
-        parent = express();
-        parent.use(child);
-
-        entry = child.stack[2];
+        entry = app.stack[2];
         t.ok(entry, 'position 2 middleware exists');
         t.equal(typeof entry.handle, 'function', 'position 2 middleware is a function');
         t.equal(entry.handle.name, 'favicon', 'position 2 middleware has the expected name');
 
-        entry = child.stack[3];
+        entry = app.stack[3];
         t.ok(entry, 'position 3 middleware exists');
         t.equal(typeof entry.handle, 'function', 'position 3 middleware is a function');
         t.equal(entry.handle.name, 'staticMiddleware', 'position 3 middleware has the expected name');
 
-        entry = child.stack[4];
+        entry = app.stack[4];
         t.ok(entry, 'position 4 middleware exists');
         t.equal(typeof entry.handle, 'function', 'position 4 middleware is a function');
         t.equal(entry.handle.name, 'logger', 'position 4 middleware has the expected name');
@@ -139,18 +121,16 @@ test('module', function (t) {
 test('factories', function (t) {
 
     t.test('custom middleware factories', function (t) {
-        var config, names, child, parent;
+        var config, names, app;
 
         config = require('./fixtures/factories');
         names = Object.keys(config);
-        child = meddle(config);
+        app = express();
+        app.use(meddle(config));
 
-        parent = express();
-        parent.use(child);
-
-        t.equal(child.stack.length, names.length + 2, 'middleware stack is correct length');
+        t.equal(app.stack.length, names.length + 2, 'middleware stack is correct length');
         names.forEach(function (name, i) {
-            var handle = child.stack[i + 2].handle;
+            var handle = app.stack[i + 2].handle;
             t.equal(typeof handle, 'function', 'position ' + i + ' middleware is a function');
             t.ok(handle.name, 'position ' + i + ' middleware has a name');
             t.ok(handle.name.match(new RegExp(name, 'g')), 'position ' + i + ' middleware name matches ' + name);
@@ -184,21 +164,20 @@ test('factories', function (t) {
 test('enabled', function (t) {
 
     t.test('only use enabled middleware', function (t) {
-        var config, names, child, parent;
+        var config, names, app;
 
         config = require('./fixtures/enabled');
         names = Object.keys(config).filter(function (prop) {
             return config[prop].enabled;
         });
 
-        child = meddle(config);
-        parent = express();
-        parent.use(child);
+        app = express();
+        app.use(meddle(config));
 
-        t.equal(child.stack.length, 9, 'middleware stack is appropriate length');
+        t.equal(app.stack.length, 9, 'middleware stack is appropriate length');
 
         names.forEach(function (name, i) {
-            var handle = child.stack[i + 2].handle;
+            var handle = app.stack[i + 2].handle;
             t.equal(typeof handle, 'function', 'position ' + i + ' middleware is a function');
             t.ok(handle.name, 'position ' + i + ' middleware has a name');
             t.ok(handle.name.match(new RegExp(name, 'g')), 'position ' + i + ' middleware name matches ' + name);
@@ -214,7 +193,7 @@ test('enabled', function (t) {
         app = express();
         app.use(meddle(config));
 
-        t.equal(app.stack.length, 3, 'middleware stack is appropriate length');
+        t.equal(app.stack.length, 6, 'middleware stack is appropriate length');
 
         function req(cb) {
             var server;
@@ -252,18 +231,15 @@ test('enabled', function (t) {
 
 
     t.test('ignore express objects', function (t) {
-        var config, parent, child;
+        var config, app;
 
         config = require('./fixtures/toggle');
-        child = meddle(config);
-        parent = express();
-        parent.use(child);
+        app = express();
+        app.use(meddle(config));
 
-        // The final middleware for both child and parent should be the anonymous
-        // wrapper created for express objects. Otherwise, middleware should be
-        // the named wrapper.
-        t.strictEqual(child.stack[child.stack.length - 1].handle.name, '');
-        t.strictEqual(parent.stack[parent.stack.length - 1].handle.name, '');
+        // The final middleware should be the anonymous wrapper created for
+        // express objects. Otherwise, middleware should be the named wrapper.
+        t.strictEqual(app.stack[app.stack.length - 1].handle.name, '');
         t.end();
     });
 
@@ -293,24 +269,23 @@ test('events', function (t) {
 
 
     t.test('before and after named registration events', function (t) {
-        var config, events, child, parent;
+        var config, events, app;
 
         config = require('./fixtures/defaults');
         events = 0;
-        child = meddle(config);
-        parent = express();
+        app = express();
 
-        parent.on('middleware:before:favicon', function (eventargs) {
-            t.equal(eventargs.app, child);
+        app.on('middleware:before:favicon', function (eventargs) {
+            t.equal(eventargs.app, app);
             events += 1;
         });
 
-        parent.on('middleware:after:favicon', function (eventargs) {
-            t.equal(eventargs.app, child);
+        app.on('middleware:after:favicon', function (eventargs) {
+            t.equal(eventargs.app, app);
             events += 1;
         });
 
-        parent.use(child);
+        app.use(meddle(config));
         t.equal(events, 2, 'registration events were triggered');
         t.end();
     });

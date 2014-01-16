@@ -19,7 +19,7 @@
 
 var path = require('path'),
     caller = require('caller'),
-    cellophane = require('cellophane');
+    express = require('express');
 
 
 function isExpress(obj) {
@@ -198,14 +198,17 @@ module.exports = function meddleware(settings) {
     root = path.dirname(caller());
 
     function onmount(parent) {
+        // Remove the sacrificial express app.
+        parent.stack.pop();
+
         // Process teh middlewarez
         Object.keys(settings)
             .map(namer(settings))
             .sort(sort)
-            .forEach(register(app, root));
+            .forEach(register(parent, root));
     }
 
-    app = cellophane();
+    app = express();
     app.once('mount', onmount);
     return app;
 };
