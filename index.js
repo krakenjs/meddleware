@@ -70,11 +70,12 @@ function resolveModule(file, root) {
         module = tryResolve(file);
     }
 
+    debug('loading module', module);
+    
     if (!module) {
         throw new TypeError('Module not found: ' + file);
     }
 
-    debug('loading module', module);
     return require(module);
 }
 
