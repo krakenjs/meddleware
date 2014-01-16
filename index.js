@@ -78,6 +78,14 @@ function resolveModule(file, root) {
     return require(module);
 }
 
+
+
+function defined(obj) {
+    return function (key) {
+        return !!obj[key];
+    };
+}
+
 /**
  * A factory function that creates a handler which will add a property called `name` to the object
  * located at property `name` on a parent object.
@@ -207,6 +215,7 @@ module.exports = function meddleware(settings) {
 
         // Process teh middlewarez
         Object.keys(settings)
+            .filter(defined(settings))
             .map(namer(settings))
             .sort(sort)
             .forEach(register(parent, root));

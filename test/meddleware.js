@@ -40,6 +40,19 @@ test('meddleware', function (t) {
         t.end();
     });
 
+
+    t.test('not defined property', function (t) {
+        var config, app;
+
+        config = require('./fixtures/undefined');
+
+        app = express();
+        app.use(meddle(config));
+
+        t.equal(app.stack.length, 6, 'middleware stack is appropriate length');
+        t.end();
+    });
+
 });
 
 

@@ -1,0 +1,36 @@
+{
+    "favicon": {
+        "enabled": true,
+        "priority": 10,
+        "module": "express",
+        "arguments": null
+    },
+
+    "static": {
+        "enabled": true,
+        "priority": 30,
+        "module": "express",
+        "arguments": [ "path:./.build" ]
+    },
+
+    "logger": null,
+
+    "json": {
+        "enabled": true,
+        "priority": 60,
+        "module": "express",
+        "arguments": null
+    },
+
+    "urlencoded": {
+        "enabled": true,
+        "priority": 70,
+        "module": "express",
+        "arguments": null
+    },
+
+    "cookieParser": null,
+
+    "session": null
+
+}
