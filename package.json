@@ -30,8 +30,7 @@
     "jshint": "~2.3.0"
   },
   "dependencies": {
-    "caller": "0.0.1",
-    "cellophane": "0.0.2"
+    "caller": "0.0.1"
   },
   "repository": {
     "type": "git",
