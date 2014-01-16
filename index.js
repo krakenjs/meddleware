@@ -60,6 +60,8 @@ function isAbsolutePath(file) {
 function resolveModule(file, root) {
     var module;
 
+    debug('resolving module', file);
+    
     if (!file) {
         throw new TypeError('Module not defined.');
     }
@@ -71,7 +73,7 @@ function resolveModule(file, root) {
     }
 
     debug('loading module', module);
-    
+
     if (!module) {
         throw new TypeError('Module not found: ' + file);
     }
