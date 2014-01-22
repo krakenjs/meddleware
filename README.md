@@ -1,6 +1,8 @@
 #### meddleware
 Configuration-based middleware registration for express.
 
+[![Build Status](https://travis-ci.org/paypal/meddleware.png)](https://travis-ci.org/paypal/meddleware)
+
 #### Usage
 ```javascript
 var http = require('http'),
