@@ -365,3 +365,121 @@ test('routes', function (t) {
     });
 
 });
+
+
+test('composition', function (t) {
+
+    t.test('parallel', function (t) {
+        var config, app, time;
+
+        function req(route, cb) {
+            var server;
+            server = request(app)
+                .get(route)
+                .end(function (err, res) {
+
+                    t.error(err, 'no response error');
+                    t.equal(typeof res, 'object', 'response is defined');
+                    t.equal(typeof res.body, 'object', 'response body is defined');
+
+                    server.app.close(function () {
+                        cb(res.body);
+                    });
+                });
+        }
+
+        config = require('./fixtures/parallel');
+
+        app = express();
+        app.use(meddle(config));
+
+        app.get('/', function (req, res) {
+            t.ok(res.locals.parallelA);
+            t.ok(res.locals.parallelB);
+            t.ok(res.locals.parallelC);
+            res.send(200);
+        });
+
+        time = Date.now();
+        req('/', function () {
+            time = Date.now() - time;
+            t.ok(time > 1450);
+            t.ok(time < 1550);
+            t.end();
+        });
+    });
+
+
+    t.test('race', function (t) {
+        var config, app, time;
+
+        function req(route, cb) {
+            var server;
+            server = request(app)
+                .get(route)
+                .end(function (err, res) {
+
+                    t.error(err, 'no response error');
+                    t.equal(typeof res, 'object', 'response is defined');
+                    t.equal(typeof res.body, 'object', 'response body is defined');
+
+                    server.app.close(function () {
+                        cb(res.body);
+                    });
+                });
+        }
+
+        config = require('./fixtures/race');
+
+        app = express();
+        app.use(meddle(config));
+
+        app.get('/', function (req, res) {
+            t.equal(res.locals.winner, 'a');
+            res.send(200);
+        });
+
+        time = Date.now();
+        req('/', function () {
+            time = Date.now() - time;
+            t.ok(time < 50);
+            t.end();
+        });
+    });
+
+
+    t.test('fallback', function (t) {
+        var config, app, time;
+
+        function req(route, cb) {
+            var server;
+            server = request(app)
+                .get(route)
+                .end(function (err, res) {
+
+                    t.error(err, 'no response error');
+                    t.equal(typeof res, 'object', 'response is defined');
+                    t.equal(typeof res.body, 'object', 'response body is defined');
+
+                    server.app.close(function () {
+                        cb(res.body);
+                    });
+                });
+        }
+
+        config = require('./fixtures/fallback');
+
+        app = express();
+        app.use(meddle(config));
+
+        app.get('/', function (req, res) {
+            t.equal(res.locals.fallback, 'c');
+            res.send(200);
+        });
+
+        req('/', function () {
+            t.end();
+        });
+    });
+
+});
