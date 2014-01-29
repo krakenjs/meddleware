@@ -1,53 +1,65 @@
 /*───────────────────────────────────────────────────────────────────────────*\
- │  Copyright (C) 2013 eBay Software Foundation                                │
- │                                                                             │
- │hh ,'""`.                                                                    │
- │  / _  _ \  Licensed under the Apache License, Version 2.0 (the "License");  │
- │  |(@)(@)|  you may not use this file except in compliance with the License. │
- │  )  __  (  You may obtain a copy of the License at                          │
- │ /,'))((`.\                                                                  │
- │(( ((  )) ))    http://www.apache.org/licenses/LICENSE-2.0                   │
- │ `\ `)(' /'                                                                  │
- │                                                                             │
- │   Unless required by applicable law or agreed to in writing, software       │
- │   distributed under the License is distributed on an "AS IS" BASIS,         │
- │   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.  │
- │   See the License for the specific language governing permissions and       │
- │   limitations under the License.                                            │
+ │  Copyright (C) 2013 eBay Software Foundation                               │
+ │                                                                            │
+ │  Licensed under the Apache License, Version 2.0 (the "License");           │
+ │  you may not use this file except in compliance with the License.          │
+ │  You may obtain a copy of the License at                                   │
+ │                                                                            │
+ │    http://www.apache.org/licenses/LICENSE-2.0                              │
+ │                                                                            │
+ │  Unless required by applicable law or agreed to in writing, software       │
+ │  distributed under the License is distributed on an "AS IS" BASIS,         │
+ │  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.  │
+ │  See the License for the specific language governing permissions and       │
+ │  limitations under the License.                                            │
  \*───────────────────────────────────────────────────────────────────────────*/
 'use strict';
 
 var path = require('path'),
+    RQ = require('./lib/rq'),
     caller = require('caller'),
     express = require('express'),
+    util = require('./lib/util'),
+    thing = require('core-util-is'),
     debug = require('debuglog')('meddleware');
 
 
-function isExpress(obj) {
-    return obj.handle && obj.set;
-}
-
 /**
- * Determines if node is able to resolve the provided module file.
- * @param module The file path to the desired module.
- * @returns {*} The absolute path to the module or `undefined` if not found.
+ * Creates a middleware resolver based on the provided basedir.
+ * @param basedir the directory against which to resolve relative paths.
+ * @returns {resolve} a the implementation that converts a given spec to a middleware function.
  */
-function tryResolve(module) {
-    try {
-        return require.resolve(module);
-    } catch (e) {
-        return undefined;
-    }
-}
+function resolvery(basedir) {
+    return function resolve(spec, name) {
+        var fns, fn, args;
 
+        spec.name = spec.name || name;
 
-/**
- * Determines if the provided argument is an absolute file path.
- * @param file The path in question.
- * @returns {boolean} `true` if the file path is absolute, `false` if not.
- */
-function isAbsolutePath(file) {
-    return path.resolve(file) === file;
+        if (spec.parallel) {
+            fns = util.mapValues(spec.parallel, resolve);
+            fn = middleware(RQ.parallel, fns);
+
+        } else if (spec.race) {
+            fns = util.mapValues(spec.race, resolve);
+            fn = middleware(RQ.race, fns);
+
+        } else if (spec.fallback) {
+            fns = util.mapValues(spec.fallback, util.nameObject);
+            fns = fns.filter(thing.isObject).sort(compare);
+            fns = util.mapValues(fns, resolve);
+            fn = middleware(RQ.fallback, fns);
+
+        } else {
+            args = spec['arguments'];
+            args = Array.isArray(args) ? args.slice() : [];
+
+            fn = resolveModule(spec.module, basedir);
+            fn = resolveFactory(fn, spec);
+            fn = createToggleWrapper(fn.apply(null, args), spec);
+        }
+
+        return fn;
+    };
 }
 
 
@@ -61,15 +73,15 @@ function resolveModule(file, root) {
     var module;
 
     debug('resolving module', file);
-    
+
     if (!file) {
         throw new TypeError('Module not defined.');
     }
 
-    module = tryResolve(file);
-    if (!module && !isAbsolutePath(file)) {
+    module = util.tryResolve(file);
+    if (!module && !util.isAbsolutePath(file)) {
         file = path.resolve(root, file);
-        module = tryResolve(file);
+        module = util.tryResolve(file);
     }
 
     debug('loading module', module);
@@ -79,43 +91,6 @@ function resolveModule(file, root) {
     }
 
     return require(module);
-}
-
-
-
-function defined(obj) {
-    return function (key) {
-        return !!obj[key];
-    };
-}
-
-/**
- * A factory function that creates a handler which will add a property called `name` to the object
- * located at property `name` on a parent object.
- * @param parent The parent object containing the named property in question.
- * @returns {Function} The handler used to do the renaming.
- */
-function namer(parent) {
-    return function name(key) {
-        var spec;
-        spec = parent[key];
-        spec.name = key;
-        return spec;
-    };
-}
-
-
-/**
- * Sort implementation for objects with a numeric `proiority` property.
- * @param a
- * @param b
- * @returns {number}
- */
-function sort(a, b) {
-    var ap, bp;
-    ap = typeof a.priority === 'number' ? a.priority : Number.MIN_VALUE;
-    bp = typeof b.priority === 'number' ? b.priority : Number.MIN_VALUE;
-    return ap - bp;
 }
 
 
@@ -153,7 +128,7 @@ function createToggleWrapper(fn, settings) {
     var name, impl;
 
     // Do not wrap express objects
-    if (isExpress(fn)) {
+    if (util.isExpress(fn)) {
         return fn;
     }
 
@@ -171,57 +146,84 @@ function createToggleWrapper(fn, settings) {
 
 
 /**
- * A factory function used to create the middleware registration implementation.
- * @param app The app against which middleware will be registered.
- * @param root The root directory used for resolving modules, etc.
+ * Middleware Factory
+ * @param requestory
+ * @param fns
  * @returns {Function}
  */
-function register(app, root) {
-    return function registrar(spec) {
-        var args, fn, eventargs;
-
-        args = spec['arguments'];
-        args = Array.isArray(args) ? args.slice() : [];
-
-        fn = resolveModule(spec.module, root);
-        fn = resolveFactory(fn, spec);
-        fn = createToggleWrapper(fn.apply(null, args), spec);
-
-        eventargs = {
-            app: app,
-            config: spec
-        };
-
-        debug('registering', spec.name, 'middleware');
-
-        app.emit('middleware:before', eventargs);
-        app.emit('middleware:before:' + spec.name, eventargs);
-        typeof spec.route === 'string' ? app.use(spec.route, fn) : app.use(fn);
-        app.emit('middleware:after:' + spec.name, eventargs);
-        app.emit('middleware:after', eventargs);
+function middleware(requestory, fns) {
+    var rq = requestory(fns.map(taskery));
+    return function composite(req, res, next) {
+        function complete(success, failure) {
+            next(failure);
+        }
+        rq(complete, { req: req, res: res });
     };
 }
 
 
+/**
+ * Task Factory
+ * @param fn
+ * @returns {requestor}
+ */
+function taskery(fn) {
+    return function requestor(requestion, value) {
+        fn(value.req, value.res, function (err) {
+            requestion(null, err);
+        });
+    };
+}
+
+
+/**
+ * Comparator for sorting middleware by priority
+ * @param a
+ * @param b
+ * @returns {number}
+ */
+function compare(a, b) {
+    var ap, bp;
+    ap = typeof a.priority === 'number' ? a.priority : Number.MIN_VALUE;
+    bp = typeof b.priority === 'number' ? b.priority : Number.MIN_VALUE;
+    return ap - bp;
+}
+
 
 module.exports = function meddleware(settings) {
-    var root, app;
+    var basedir, app;
 
-    // The `require`-ing module (caller) is considered the `root`
+    // The `require`-ing module (caller) is considered the `basedir`
     // against which relative file paths will be resolved.
     // Don't like it? Then pass absolute module paths. :D
-    root = path.dirname(caller());
+    basedir = path.dirname(caller());
 
-    function onmount(parent) {
+    function onmount(app) {
+        var resolve;
+
         // Remove the sacrificial express app.
-        parent.stack.pop();
+        app.stack.pop();
 
-        // Process teh middlewarez
-        Object.keys(settings)
-            .filter(defined(settings))
-            .map(namer(settings))
-            .sort(sort)
-            .forEach(register(parent, root));
+        resolve = resolvery(basedir);
+
+        util
+            .mapValues(settings, util.nameObject)
+            .filter(thing.isObject)
+            .sort(compare)
+            .forEach(function register(spec) {
+                var fn, eventargs;
+
+                fn = resolve(spec, spec.name);
+                eventargs = { app: app, config: spec };
+
+                debug('registering', spec.name, 'middleware');
+
+                app.emit('middleware:before', eventargs);
+                app.emit('middleware:before:' + spec.name, eventargs);
+                typeof spec.route === 'string' ? app.use(spec.route, fn) : app.use(fn);
+                app.emit('middleware:after:' + spec.name, eventargs);
+                app.emit('middleware:after', eventargs);
+            });
     }
 
     app = express();

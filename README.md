@@ -48,6 +48,17 @@ http.createServer(app).listen(8080);
         "priority": 40,
         "module": "express",
         "arguments": [ "keyboard cat" ]
+    },
+
+    "misc": {
+        "priority": 50,
+        "parallel": {
+            "user": {
+                "enabled": true,
+                "module": "express",
+                "arguments": []
+            },
+        }
     }
 }
 

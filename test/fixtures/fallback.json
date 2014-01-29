@@ -1,0 +1,23 @@
+{
+    "simultaneous": {
+        "enabled": true,
+        "priority": 50,
+        "fallback": {
+            "middlewareA": {
+                "enabled": true,
+                "priority": 10,
+                "module": "./fixtures/middleware/fallback"
+            },
+            "middlewareB": {
+                "enabled": true,
+                "priority": 20,
+                "module": "./fixtures/middleware/fallback"
+            },
+            "middlewareC": {
+                "enabled": true,
+                "priority": 30,
+                "module": "./fixtures/middleware/fallback"
+            }
+        }
+    }
+}

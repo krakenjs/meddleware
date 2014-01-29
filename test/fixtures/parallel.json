@@ -1,0 +1,33 @@
+{
+    "simultaneous": {
+        "enabled": true,
+        "priority": 50,
+        "parallel": {
+            "middlewareA": {
+                "enabled": true,
+                "parallel": {
+                    "middlewareA": {
+                        "enabled": true,
+                        "module": "./fixtures/middleware/parallel"
+                    },
+                    "middlewareB": {
+                        "enabled": true,
+                        "module": "./fixtures/middleware/parallel"
+                    },
+                    "middlewareC": {
+                        "enabled": true,
+                        "module": "./fixtures/middleware/parallel"
+                    }
+                }
+            },
+            "middlewareB": {
+                "enabled": true,
+                "module": "./fixtures/middleware/parallel"
+            },
+            "middlewareC": {
+                "enabled": true,
+                "module": "./fixtures/middleware/parallel"
+            }
+        }
+    }
+}

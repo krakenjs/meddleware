@@ -1,0 +1,20 @@
+{
+    "simultaneous": {
+    "enabled": true,
+        "priority": 50,
+        "race": {
+            "middlewareA": {
+                "enabled": true,
+                "module": "./fixtures/middleware/race"
+            },
+            "middlewareB": {
+                "enabled": true,
+                "module": "./fixtures/middleware/race"
+            },
+            "middlewareC": {
+                "enabled": true,
+                "module": "./fixtures/middleware/race"
+            }
+        }
+    }
+}
