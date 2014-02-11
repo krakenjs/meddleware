@@ -11,7 +11,7 @@ var http = require('http'),
     config = require('shush')('./config/middleware');
 
 var app = express();
-app.use(meddleware(config));
+app.use(meddleware(config)); // or app.use('/foo', meddleware(config));
 http.createServer(app).listen(8080);
 
 ```

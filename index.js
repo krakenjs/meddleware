@@ -198,31 +198,38 @@ module.exports = function meddleware(settings) {
     // Don't like it? Then pass absolute module paths. :D
     basedir = path.dirname(caller());
 
-    function onmount(app) {
-        var resolve;
+    function onmount(parent) {
+        var resolve, approute;
 
         // Remove the sacrificial express app.
-        app.stack.pop();
+        parent.stack.pop();
 
         resolve = resolvery(basedir);
+        approute = app.route;
 
         util
             .mapValues(settings, util.nameObject)
             .filter(thing.isObject)
             .sort(compare)
             .forEach(function register(spec) {
-                var fn, eventargs;
+                var fn, eventargs, route;
 
                 fn = resolve(spec, spec.name);
-                eventargs = { app: app, config: spec };
+                eventargs = { app: parent, config: spec };
+
+                route = approute;
+                if (typeof spec.route === 'string') {
+                    route += route[route.length - 1] !== '/' ? '/' : '';
+                    route += spec.route[0] === '/' ? spec.route.slice(1) : spec.route;
+                }
 
                 debug('registering', spec.name, 'middleware');
 
-                app.emit('middleware:before', eventargs);
-                app.emit('middleware:before:' + spec.name, eventargs);
-                typeof spec.route === 'string' ? app.use(spec.route, fn) : app.use(fn);
-                app.emit('middleware:after:' + spec.name, eventargs);
-                app.emit('middleware:after', eventargs);
+                parent.emit('middleware:before', eventargs);
+                parent.emit('middleware:before:' + spec.name, eventargs);
+                parent.use(route, fn);
+                parent.emit('middleware:after:' + spec.name, eventargs);
+                parent.emit('middleware:after', eventargs);
             });
     }
 
