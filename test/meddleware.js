@@ -306,6 +306,44 @@ test('events', function (t) {
 });
 
 
+test('error middleware', function (t) {
+
+    t.test('arity of 4', function (t) {
+        var config, app;
+
+        function req(route, cb) {
+            var server;
+            server = request(app)
+                .get(route)
+                .end(function (err, res) {
+                    t.error(err, 'no response error');
+                    t.equal(res.statusCode, 500, 'response statusCode is 500');
+                    t.equal(res.text, 'Oh noes!', 'response status is defined');
+
+                    server.app.close(function () {
+                        cb(res.text);
+                    });
+                });
+        }
+
+        config = require('./fixtures/error');
+
+        app = express();
+
+        app.get('/', function (req, res) {
+            throw new Error('Oh noes!');
+        });
+
+        app.use(meddle(config));
+
+        req('/', function () {
+            t.end();
+        });
+    });
+
+});
+
+
 test('routes', function (t) {
 
     t.test('route-specific middleware', function (t) {

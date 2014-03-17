@@ -132,9 +132,16 @@ function createToggleWrapper(fn, settings) {
         return fn;
     }
 
-    impl = "function $name(req, res, next) { \
-        settings.enabled ? fn(req, res, next) : next(); \
-    }";
+    // If the function arity is 4 then account for error handler
+    if (fn.length === 4) {
+        impl = 'function $name(err, req, res, next) { \
+            settings.enabled ? fn(err, req, res, next) : next(err); \
+        }';
+    } else {
+        impl = 'function $name(req, res, next) { \
+            settings.enabled ? fn(req, res, next) : next(); \
+        }';
+    }
 
     name = fn.name || settings.name;
     if (!/^[$_A-Za-z\xa0-\uffff][$_A-Za-z0-9\xa0-\uffff]*$/.test(name)) {
