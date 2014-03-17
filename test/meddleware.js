@@ -330,6 +330,7 @@ test('error middleware', function (t) {
 
         app = express();
 
+        // Putting the route before meddle() to ensure the router is seen first
         app.get('/', function (req, res) {
             throw new Error('Oh noes!');
         });
