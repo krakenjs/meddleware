@@ -36,10 +36,10 @@
   },
   "repository": {
     "type": "git",
-    "url": "git://github.com/paypal/meddleware.git"
+    "url": "git://github.com/krakenjs/meddleware.git"
   },
   "bugs": {
-    "url": "https://github.com/paypal/meddleware/issues"
+    "url": "https://github.com/krakenjs/meddleware/issues"
   },
-  "homepage": "https://github.com/paypal/meddleware"
+  "homepage": "https://github.com/krakenjs/meddleware"
 }
