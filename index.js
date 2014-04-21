@@ -15,13 +15,13 @@
  \*───────────────────────────────────────────────────────────────────────────*/
 'use strict';
 
-var path = require('path'),
-    RQ = require('./lib/rq'),
-    caller = require('caller'),
-    express = require('express'),
-    util = require('./lib/util'),
-    thing = require('core-util-is'),
-    debug = require('debuglog')('meddleware');
+var path = require('path');
+var RQ = require('./lib/rq');
+var caller = require('caller');
+var express = require('express');
+var util = require('./lib/util');
+var thing = require('core-util-is');
+var debug = require('debuglog')('meddleware');
 
 
 /**
@@ -199,13 +199,13 @@ module.exports = function meddleware(settings) {
     basedir = path.dirname(caller());
 
     function onmount(parent) {
-        var resolve, approute;
+        var resolve, mountpath;
 
         // Remove the sacrificial express app.
-        parent.stack.pop();
+        parent._router.stack.pop();
 
         resolve = resolvery(basedir);
-        approute = app.route;
+        mountpath = app.mountpath;
 
         util
             .mapValues(settings, util.nameObject)
@@ -217,7 +217,7 @@ module.exports = function meddleware(settings) {
                 fn = resolve(spec, spec.name);
                 eventargs = { app: parent, config: spec };
 
-                route = approute;
+                route = mountpath;
                 if (typeof spec.route === 'string') {
                     route += route[route.length - 1] !== '/' ? '/' : '';
                     route += spec.route[0] === '/' ? spec.route.slice(1) : spec.route;

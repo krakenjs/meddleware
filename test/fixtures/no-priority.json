@@ -2,19 +2,19 @@
     "logger": {
         "enabled": true,
         "priority": 1,
-        "module": "express",
+        "module": "morgan",
         "arguments": null
     },
 
     "favicon": {
         "enabled": true,
-        "module": "express",
+        "module": "static-favicon",
         "arguments": null
     },
 
     "static": {
         "enabled": true,
-        "module": "express",
+        "module": "serve-static",
         "arguments": [ "path:./.build" ]
     }
 }

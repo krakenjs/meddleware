@@ -2,14 +2,14 @@
     "favicon": {
         "enabled": true,
         "priority": 10,
-        "module": "express",
+        "module": "static-favicon",
         "arguments": null
     },
 
     "static": {
         "enabled": true,
         "priority": 30,
-        "module": "express",
+        "module": "serve-static",
         "arguments": [ "path:./.build" ]
     },
 
@@ -18,15 +18,15 @@
     "json": {
         "enabled": true,
         "priority": 60,
-        "module": "express",
-        "arguments": null
+        "module": "body-parser",
+        "factoryMethod": "json"
     },
 
     "urlencoded": {
         "enabled": true,
         "priority": 70,
-        "module": "express",
-        "arguments": null
+        "module": "body-parser",
+        "factoryMethod": "urlencoded"
     },
 
     "cookieParser": null,
