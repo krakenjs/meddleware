@@ -315,10 +315,7 @@ test('error middleware', function (t) {
                     t.error(err, 'no response error');
                     t.equal(res.statusCode, 500, 'response statusCode is 500');
                     t.equal(res.text, 'Oh noes!', 'response status is defined');
-
-                    server.app.close(function () {
-                        cb(res.text);
-                    });
+                    cb(res.text);
                 });
         }
 
