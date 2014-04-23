@@ -1,6 +1,6 @@
 {
   "name": "meddleware",
-  "version": "0.1.2",
+  "version": "1.0.0",
   "description": "Configuration-based middleware registration for express.",
   "main": "index.js",
   "directories": {
