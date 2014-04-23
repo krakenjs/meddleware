@@ -23,21 +23,21 @@
     }
   ],
   "devDependencies": {
-    "tape": "~2.3.2",
-    "express": "^4.0",
-    "istanbul": "~0.2.1",
-    "supertest": "~0.8.2",
-    "jshint": "~2.3.0",
-    "static-favicon": "~1.0.2",
-    "serve-static": "~1.0.4",
-    "morgan": "~1.0.0",
-    "body-parser": "~1.0.2",
-    "cookie-parser": "~1.0.1"
+    "tape": "^2.12.3",
+    "express": "^4.0.0",
+    "istanbul": "^0.2.7",
+    "supertest": "^0.11.0",
+    "jshint": "^2.5.0",
+    "static-favicon": "^1.0.2",
+    "serve-static": "^1.0.4",
+    "morgan": "^1.0.0",
+    "body-parser": "^1.0.2",
+    "cookie-parser": "^1.0.1"
   },
   "dependencies": {
-    "caller": "~0.0.1",
-    "debuglog": "~0.0.2",
-    "core-util-is": "~1.0.1"
+    "caller": "0.0.1",
+    "debuglog": "0.0.4",
+    "core-util-is": "^1.0.1"
   },
   "repository": {
     "type": "git",

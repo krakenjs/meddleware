@@ -5,15 +5,24 @@
         "race": {
             "middlewareA": {
                 "enabled": true,
-                "module": "./fixtures/middleware/race"
+                "module": {
+                    "name": "./fixtures/middleware/race",
+                    "method": "middlewareA"
+                }
             },
             "middlewareB": {
                 "enabled": true,
-                "module": "./fixtures/middleware/race"
+                "module": {
+                    "name": "./fixtures/middleware/race",
+                    "method": "middlewareB"
+                }
             },
             "middlewareC": {
                 "enabled": true,
-                "module": "./fixtures/middleware/race"
+                "module": {
+                    "name": "./fixtures/middleware/race",
+                    "method": "middlewareC"
+                }
             }
         }
     }

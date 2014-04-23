@@ -2,15 +2,16 @@
     "favicon": {
         "enabled": true,
         "priority": 10,
-        "module": "static-favicon",
-        "arguments": null
+        "module": "static-favicon"
     },
 
     "static": {
         "enabled": true,
         "priority": 30,
-        "module": "serve-static",
-        "arguments": [ "path:./.build" ]
+        "module": {
+            "name": "serve-static",
+            "arguments": [ "path:./.build" ]
+        }
     },
 
     "logger": null,
@@ -18,15 +19,19 @@
     "json": {
         "enabled": true,
         "priority": 60,
-        "module": "body-parser",
-        "factoryMethod": "json"
+        "module": {
+            "name": "body-parser",
+            "method": "json"
+        }
     },
 
     "urlencoded": {
         "enabled": true,
         "priority": 70,
-        "module": "body-parser",
-        "factoryMethod": "urlencoded"
+        "module": {
+            "name": "body-parser",
+            "method": "urlencoded"
+        }
     },
 
     "cookieParser": null,

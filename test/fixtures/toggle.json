@@ -2,25 +2,33 @@
     "a": {
         "enabled": true,
         "priority": 0,
-        "module": "./fixtures/middleware/toggle",
-        "factoryMethod": "middlewareA"
+        "module": {
+            "name": "./fixtures/middleware/toggle",
+            "method": "middlewareA"
+        }
     },
     "b": {
         "enabled": true,
         "priority": 1,
-        "module": "./fixtures/middleware/toggle",
-        "factoryMethod": "middlewareB"
+        "module": {
+            "name": "./fixtures/middleware/toggle",
+            "method": "middlewareB"
+        }
     },
     "c": {
         "enabled": true,
         "priority": 2,
-        "module": "./fixtures/middleware/toggle",
-        "factoryMethod": "middlewareC"
+        "module": {
+            "name": "./fixtures/middleware/toggle",
+            "method": "middlewareC"
+        }
     },
     "d": {
         "enabled": true,
         "priority": 2,
-        "module": "./fixtures/middleware/toggle",
-        "factoryMethod": "middlewareD"
+        "module": {
+            "name": "./fixtures/middleware/toggle",
+            "method": "middlewareD"
+        }
     }
 }

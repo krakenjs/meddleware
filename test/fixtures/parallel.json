@@ -8,25 +8,40 @@
                 "parallel": {
                     "middlewareA": {
                         "enabled": true,
-                        "module": "./fixtures/middleware/parallel"
+                        "module": {
+                            "name": "./fixtures/middleware/parallel",
+                            "method": "middlewareA"
+                        }
                     },
                     "middlewareB": {
                         "enabled": true,
-                        "module": "./fixtures/middleware/parallel"
+                        "module": {
+                            "name": "./fixtures/middleware/parallel",
+                            "method": "middlewareB"
+                        }
                     },
                     "middlewareC": {
                         "enabled": true,
-                        "module": "./fixtures/middleware/parallel"
+                        "module": {
+                            "name": "./fixtures/middleware/parallel",
+                            "method": "middlewareC"
+                        }
                     }
                 }
             },
             "middlewareB": {
                 "enabled": true,
-                "module": "./fixtures/middleware/parallel"
+                "module": {
+                    "name": "./fixtures/middleware/parallel",
+                    "method": "middlewareB"
+                }
             },
             "middlewareC": {
                 "enabled": true,
-                "module": "./fixtures/middleware/parallel"
+                "module": {
+                    "name": "./fixtures/middleware/parallel",
+                    "method": "middlewareC"
+                }
             }
         }
     }

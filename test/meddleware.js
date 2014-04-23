@@ -119,8 +119,8 @@ test('module', function (t) {
                 app = express();
                 app.use(meddle(require('./fixtures/missing')));
             } catch (e) {
-                t.ok(e instanceof TypeError, 'error is TypeError');
-                t.ok(e.message.match(/^Module not found:/ig), 'error message specified module is not found');
+                t.ok(e instanceof Error);
+                t.equal(e.code, 'MODULE_NOT_FOUND');
                 throw e;
             }
         });
@@ -215,14 +215,10 @@ test('enabled', function (t) {
                 .set('Accept', 'application/json')
                 .expect('Content-Type', /json/)
                 .end(function (err, res) {
-
                     t.error(err, 'no response error');
                     t.equal(typeof res, 'object', 'response is defined');
                     t.equal(typeof res.body, 'object', 'response body is defined');
-
-                    server.app.close(function () {
-                        cb(res.body);
-                    });
+                    cb(res.body);
                 });
         }
 
@@ -319,10 +315,7 @@ test('error middleware', function (t) {
                     t.error(err, 'no response error');
                     t.equal(res.statusCode, 500, 'response statusCode is 500');
                     t.equal(res.text, 'Oh noes!', 'response status is defined');
-
-                    server.app.close(function () {
-                        cb(res.text);
-                    });
+                    cb(res.text);
                 });
         }
 
@@ -355,14 +348,10 @@ test('routes', function (t) {
             server = request(app)
                 .get(route)
                 .end(function (err, res) {
-
                     t.error(err, 'no response error');
                     t.equal(typeof res, 'object', 'response is defined');
                     t.equal(typeof res.body, 'object', 'response body is defined');
-
-                    server.app.close(function () {
-                        cb(res.body);
-                    });
+                    cb(res.body);
                 });
         }
 
@@ -415,10 +404,7 @@ test('routes', function (t) {
                     t.error(err, 'no response error');
                     t.equal(typeof res, 'object', 'response is defined');
                     t.equal(typeof res.body, 'object', 'response body is defined');
-
-                    server.app.close(function () {
-                        cb(res.body);
-                    });
+                    cb(res.body);
                 });
         }
 
@@ -474,14 +460,10 @@ test('composition', function (t) {
             server = request(app)
                 .get(route)
                 .end(function (err, res) {
-
                     t.error(err, 'no response error');
                     t.equal(typeof res, 'object', 'response is defined');
                     t.equal(typeof res.body, 'object', 'response body is defined');
-
-                    server.app.close(function () {
-                        cb(res.body);
-                    });
+                    cb(res.body);
                 });
         }
 
@@ -515,14 +497,10 @@ test('composition', function (t) {
             server = request(app)
                 .get(route)
                 .end(function (err, res) {
-
                     t.error(err, 'no response error');
                     t.equal(typeof res, 'object', 'response is defined');
                     t.equal(typeof res.body, 'object', 'response body is defined');
-
-                    server.app.close(function () {
-                        cb(res.body);
-                    });
+                    cb(res.body);
                 });
         }
 
@@ -553,14 +531,10 @@ test('composition', function (t) {
             server = request(app)
                 .get(route)
                 .end(function (err, res) {
-
                     t.error(err, 'no response error');
                     t.equal(typeof res, 'object', 'response is defined');
                     t.equal(typeof res.body, 'object', 'response body is defined');
-
-                    server.app.close(function () {
-                        cb(res.body);
-                    });
+                    cb(res.body);
                 });
         }
 
