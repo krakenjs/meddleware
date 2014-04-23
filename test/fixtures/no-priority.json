@@ -2,19 +2,19 @@
     "logger": {
         "enabled": true,
         "priority": 1,
-        "module": "morgan",
-        "arguments": null
+        "module": "morgan"
     },
 
     "favicon": {
         "enabled": true,
-        "module": "static-favicon",
-        "arguments": null
+        "module": "static-favicon"
     },
 
     "static": {
         "enabled": true,
-        "module": "serve-static",
-        "arguments": [ "path:./.build" ]
+        "module": {
+            "name": "serve-static",
+            "arguments": [ "path:./.build" ]
+        }
     }
 }

@@ -2,23 +2,29 @@
     "routeA": {
         "enabled": true,
         "priority": 50,
-        "module": "./fixtures/middleware/routes",
-        "route": "/foo",
-        "arguments": null
+        "module": {
+            "name": "./fixtures/middleware/routes",
+            "method": "routeA"
+        },
+        "route": "/foo"
     },
 
     "routeB": {
         "enabled": true,
         "priority": 60,
-        "module": "./fixtures/middleware/routes",
-        "arguments": null
+        "module": {
+            "name": "./fixtures/middleware/routes",
+            "method": "routeB"
+        }
     },
 
     "routeC": {
         "enabled": true,
         "priority": 70,
-        "module": "./fixtures/middleware/routes",
-        "route": "bar",
-        "arguments": null
+        "module": {
+            "name": "./fixtures/middleware/routes",
+            "method": "routeC"
+        },
+        "route": "bar"
     }
 }

@@ -2,20 +2,22 @@
     "demo": {
         "enabled": true,
         "priority": 50,
-        "module": "./fixtures/middleware/demo-factory",
-        "arguments": null
+        "module": "./fixtures/middleware/demo-factory"
     },
     "demo2": {
         "enabled": true,
         "priority": 60,
-        "module": "./fixtures/middleware/demo-factory-method",
-        "factoryMethod": "demo2",
-        "arguments": null
+        "module": {
+            "name": "./fixtures/middleware/demo-factory-method",
+            "method": "demo2"
+        }
     },
     "demo3": {
         "enabled": true,
         "priority": 70,
-        "module": "./fixtures/middleware/demo-factory-method",
-        "arguments": null
+        "module": {
+            "name": "./fixtures/middleware/demo-factory-method",
+            "method": "demo3"
+        }
     }
 }

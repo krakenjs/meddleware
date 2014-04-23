@@ -6,17 +6,26 @@
             "middlewareA": {
                 "enabled": true,
                 "priority": 10,
-                "module": "./fixtures/middleware/fallback"
+                "module": {
+                    "name": "./fixtures/middleware/fallback",
+                    "method": "middlewareA"
+                }
             },
             "middlewareB": {
                 "enabled": true,
                 "priority": 20,
-                "module": "./fixtures/middleware/fallback"
+                "module": {
+                    "name": "./fixtures/middleware/fallback",
+                    "method": "middlewareB"
+                }
             },
             "middlewareC": {
                 "enabled": true,
                 "priority": 30,
-                "module": "./fixtures/middleware/fallback"
+                "module": {
+                    "name": "./fixtures/middleware/fallback",
+                    "method": "middlewareC"
+                }
             }
         }
     }

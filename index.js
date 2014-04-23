@@ -16,22 +16,22 @@
 'use strict';
 
 var path = require('path');
-var RQ = require('./lib/rq');
 var caller = require('caller');
 var express = require('express');
-var util = require('./lib/util');
 var thing = require('core-util-is');
 var debug = require('debuglog')('meddleware');
+var RQ = require('./lib/rq');
+var util = require('./lib/util');
 
 
 /**
  * Creates a middleware resolver based on the provided basedir.
  * @param basedir the directory against which to resolve relative paths.
- * @returns {resolve} a the implementation that converts a given spec to a middleware function.
+ * @returns {Function} a the implementation that converts a given spec to a middleware function.
  */
 function resolvery(basedir) {
     return function resolve(spec, name) {
-        var fns, fn, args;
+        var fns, fn;
 
         spec.name = spec.name || name;
 
@@ -50,12 +50,8 @@ function resolvery(basedir) {
             fn = middleware(RQ.fallback, fns);
 
         } else {
-            args = spec['arguments'];
-            args = Array.isArray(args) ? args.slice() : [];
-
-            fn = resolveModule(spec.module, basedir);
-            fn = resolveFactory(fn, spec);
-            fn = createToggleWrapper(fn.apply(null, args), spec);
+            fn = resolveImpl(basedir, spec.module);
+            fn = createToggleWrapper(fn, spec);
         }
 
         return fn;
@@ -64,56 +60,42 @@ function resolvery(basedir) {
 
 
 /**
- * Attempts to locate a node module based on file and root directory.
- * @param file The file path (absolute or relative) for which to look up the module.
+ * Attempts to locate a node module and get the specified middleware implementation.
  * @param root The root directory to resolve to if file is a relative path.
- * @returns {*} The desired module, if located.
+ * @param config The configuration object or string describing the module and option factory method.
+ * @returns {Function} The middleware implementation, if located.
  */
-function resolveModule(file, root) {
-    var module;
+function resolveImpl(root, config) {
+    var modulePath, module, factory, args;
 
-    debug('resolving module', file);
+    if (typeof config === 'string') {
+        return resolveImpl(root, { name: config });
+    }
 
-    if (!file) {
+    if (!config || !config.name) {
         throw new TypeError('Module not defined.');
     }
 
-    module = util.tryResolve(file);
-    if (!module && !util.isAbsolutePath(file)) {
-        file = path.resolve(root, file);
-        module = util.tryResolve(file);
+    debug('loading module', config.name);
+
+    // Check the initial module, then try to resolve it to an absolute path and check again.
+    modulePath = util.tryResolve(config.name) || util.tryResolve(path.resolve(root, config.name));
+
+    // If modulePath was not resolved lookup with config.name for meaningful error message.
+    module = require(modulePath || config.name);
+
+    // First, look for a factory method
+    factory = module[config.method];
+    if (!thing.isFunction(factory)) {
+        // Then, check if the module itself is a factory
+        factory = module;
+        if (!thing.isFunction(factory)) {
+            throw new Error('Unable to locate middleware in ' + config.name);
+        }
     }
 
-    debug('loading module', module);
-
-    if (!module) {
-        throw new TypeError('Module not found: ' + file);
-    }
-
-    return require(module);
-}
-
-
-/**
- * Attempt to resolve a method on the provided module.
- * @param module The module in question.
- * @param settings The settings object containing info related to method lookup.
- * @returns {*} The factory method
- */
-function resolveFactory(module, settings) {
-    var factory;
-
-    factory = settings.factoryMethod;
-    if (typeof module[factory] === 'function') {
-        return module[factory];
-    }
-
-    factory = settings.name;
-    if (typeof module[factory] === 'function') {
-        return module[factory];
-    }
-
-    return module;
+    args = thing.isArray(config['arguments']) ? config['arguments'] : [];
+    return factory.apply(null, args);
 }
 
 
@@ -121,7 +103,7 @@ function resolveFactory(module, settings) {
  * Creates a middleware wrapper for toggling whether the middleware is enabled or disabled at runtime.
  * @param fn the original middleware implementation.
  * @param settings The settings object containing info related to creating an appropriate wrapper.
- * @returns {Object}
+ * @returns {Function}
  */
 function createToggleWrapper(fn, settings) {
     /*jshint evil:true, multistr:true*/
@@ -172,7 +154,7 @@ function middleware(requestory, fns) {
 /**
  * Task Factory
  * @param fn
- * @returns {requestor}
+ * @returns {Function}
  */
 function taskery(fn) {
     return function requestor(requestion, value) {
