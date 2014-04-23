@@ -1,6 +1,8 @@
 #### meddleware
 Configuration-based middleware registration for express.
 
+Note: `meddleware >=1.0` is only compatible with `express >=4.0`. For `express 3.x` support, please use `meddleware 0.1.x`.
+
 [![Build Status](https://travis-ci.org/krakenjs/meddleware.png)](https://travis-ci.org/krakenjs/meddleware)
 
 #### Usage
@@ -24,30 +26,36 @@ http.createServer(app).listen(8080);
     "favicon": {
         "enabled": true,
         "priority": 10,
-        "module": "express"
+        "module": "static-favicon"
     },
 
     "static": {
         "enabled": true,
         "priority": 20,
-        "module": "express",
-        "arguments": [ "public" ]
+        "module": {
+            "name": "serve-static",
+            "arguments": [ "public" ]
+        }
     },
 
     "custom": {
         "enabled": true,
         "priority": 30,
         "route": "/foo",
-        "module": "./lib/middleware",
-        "factoryMethod": "customMiddleware",
-        "arguments": [ "foo", { "bar": "baz" } ]
+        "module": {
+            "name": "./lib/middleware",
+            "method": "customMiddleware",
+            "arguments": [ "foo", { "bar": "baz" } ]
+        }
     },
 
     "cookieParser": {
         "enabled": false,
         "priority": 40,
-        "module": "express",
-        "arguments": [ "keyboard cat" ]
+        "module": {
+            "name": "cookie-parser",
+            "arguments": [ "keyboard cat" ]
+        }
     },
 
     "misc": {
@@ -55,8 +63,10 @@ http.createServer(app).listen(8080);
         "parallel": {
             "user": {
                 "enabled": true,
-                "module": "express",
-                "arguments": []
+                "module": {
+                    "name": "the-module",
+                    "arguments": []
+                }
             },
         }
     }
@@ -71,11 +81,13 @@ http.createServer(app).listen(8080);
 are registered first, while higher numbers are registered later. If `priority` is not a number, this setting defaults
 to `Number.MIN_VALUE`.
 
-- `module` (*string*) - The module to load containing the middleware implementation. Can be an installed module or a path to a module file within your project/application.
+- `module` (*object*, *string*) - The name or definition of the module to load containing the middleware implementation. Can be an installed module or a path to a module file within your project/application.
 
-- `factoryMethod` (*string*, optional) - The method on the provided module upon which invocation will create the middleware function to register. If a factory method is not provided, it defaults to the name of the current middleware being processed, and finally back to the module itself.
+    - `name` (*string*) - The name of the module or path to local module.
 
-- `arguments` (*array*, optional) - An array of arguments to pass to the middleware factory.
+    - `method` (*string*, optional) - The method on the provided module upon which invocation will create the middleware function to register. If a factory method is not provided, it defaults to the name of the current middleware being processed, and finally back to the module itself.
+
+    - `arguments` (*array*, optional) - An array of arguments to pass to the middleware factory.
 
 - `route` (*string*, optional) - An express route against which the middleware should be registered.
 
@@ -153,8 +165,10 @@ Middleware designated as `parallel` will all be executed simultaneously, continu
      "cookieParser": {
          "enabled": false,
          "priority": 10,
-         "module": "express",
-         "arguments": [ "keyboard cat" ]
+         "module": {
+            "name": "cookie-parser",
+            "arguments": [ "keyboard cat" ]
+        }
      },
 
     "setup": {
@@ -163,15 +177,15 @@ Middleware designated as `parallel` will all be executed simultaneously, continu
         "parallel": {
             "service1": {
                 "enabled": true,
-                "module": "path:./lib/middleware/services"
+                "module": "path:./lib/middleware/service1"
             },
             "service2": {
                 "enabled": true,
-                "module": "path:./lib/middleware/services"
+                "module": "path:./lib/middleware/service2"
             },
             "service3": {
                 "enabled": true,
-                "module": "path:./lib/middleware/services"
+                "module": "path:./lib/middleware/service3"
             }
         }
     },
@@ -179,7 +193,10 @@ Middleware designated as `parallel` will all be executed simultaneously, continu
     "json": {
         "enabled": true,
         "priority": 30,
-        "module": "express",
+        "module": {
+            "name": "body-parser",
+            "method": "json"
+        }
     }
 ```
 
@@ -190,8 +207,10 @@ Middleware designated as `race` will all be executed simultaneously, continuing 
      "cookieParser": {
          "enabled": false,
          "priority": 10,
-         "module": "express",
-         "arguments": [ "keyboard cat" ]
+         "module": {
+            "name": "cookie-parser",
+            "arguments": [ "keyboard cat" ]
+         }
      },
 
     "setup": {
@@ -200,11 +219,11 @@ Middleware designated as `race` will all be executed simultaneously, continuing 
         "race": {
             "service1a": {
                 "enabled": true,
-                "module": "path:./lib/middleware/services"
+                "module": "path:./lib/middleware/service1a"
             },
             "service1b": {
                 "enabled": true,
-                "module": "path:./lib/middleware/services"
+                "module": "path:./lib/middleware/service1b"
             }
         }
     },
@@ -212,7 +231,10 @@ Middleware designated as `race` will all be executed simultaneously, continuing 
     "json": {
         "enabled": true,
         "priority": 30,
-        "module": "express",
+        "module": {
+            "name": "body-parser",
+            "method": "json"
+        }
     }
 ```
 
@@ -223,8 +245,10 @@ Middleware designated as `fallback` will execute each middleware in series until
      "cookieParser": {
          "enabled": false,
          "priority": 10,
-         "module": "express",
-         "arguments": [ "keyboard cat" ]
+         "module": {
+             "name": "cookie-parser",
+             "arguments": [ "keyboard cat" ]
+         }
      },
 
     "setup": {
@@ -234,12 +258,12 @@ Middleware designated as `fallback` will execute each middleware in series until
             "primaryService": {
                 "enabled": true,
                 "priority": 10,
-                "module": "path:./lib/middleware/services"
+                "module": "path:./lib/middleware/primaryService"
             },
             "secondaryService": {
                 "enabled": true,
                 "priority": 20,
-                "module": "path:./lib/middleware/services"
+                "module": "path:./lib/middleware/secondaryService"
             }
         }
     },
@@ -247,7 +271,10 @@ Middleware designated as `fallback` will execute each middleware in series until
     "json": {
         "enabled": true,
         "priority": 30,
-        "module": "express",
+        "module": {
+            "name": "body-parser",
+            "method": "json"
+        }
     }
 ```
 
@@ -258,5 +285,5 @@ $ npm test
 
 #### Coverage
 ````bash
-$ npm run-script cover && open coverage/lcov-report/index.html
+$ npm run cover && open coverage/lcov-report/index.html
 ```
