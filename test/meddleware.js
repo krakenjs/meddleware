@@ -246,9 +246,9 @@ test('enabled', function (t) {
         app = express();
         app.use(meddle(config));
 
-        // The final middleware should be the anonymous wrapper created for
+        // The final middleware should be the 'mounted_app' wrapper created for
         // express objects. Otherwise, middleware should be the named wrapper.
-        t.strictEqual(app._router.stack[app._router.stack.length - 1].handle.name, '');
+        t.strictEqual(app._router.stack[app._router.stack.length - 1].handle.name, 'mounted_app');
         t.end();
     });
 
