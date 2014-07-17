@@ -117,11 +117,11 @@ function createToggleWrapper(fn, settings) {
     // If the function arity is 4 then account for error handler
     if (fn.length === 4) {
         impl = 'function $name(err, req, res, next) { \
-            settings.enabled !== false ? fn(err, req, res, next) : next(err); \
+            !(\'enabled\' in settings) || settings.enabled ? fn(err, req, res, next) : next(err); \
         }';
     } else {
         impl = 'function $name(req, res, next) { \
-            settings.enabled !== false ? fn(req, res, next) : next(); \
+            !(\'enabled\' in settings) || settings.enabled ? fn(req, res, next) : next(); \
         }';
     }
 
