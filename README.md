@@ -75,7 +75,7 @@ http.createServer(app).listen(8080);
 ```
 
 #### Options
-- `enabled` (*boolean*) - Set to `true` to enable middleware, `false` to disable. This option also supports enabling and disabling middleware at runtime. Defaults to `true`.
+- `enabled` (*boolean*) - Set to `true` to enable middleware, `false` to disable. This option also supports enabling and disabling middleware at runtime.
 
 - `priority` (*number*) - The weight to give a particular piece of middleware when sorting for registration. Lower numbers
 are registered first, while higher numbers are registered later. If `priority` is not a number, this setting defaults
