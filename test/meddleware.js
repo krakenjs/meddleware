@@ -176,12 +176,35 @@ test('factories', function (t) {
 
 test('enabled', function (t) {
 
+    t.test('default to enabled', function (t) {
+        var config, names, app;
+
+        config = require('./fixtures/disabled');
+        names = Object.keys(config).filter(function (prop) {
+            return config[prop].enabled !== false;
+        });
+
+        app = express();
+        app.use(meddle(config));
+
+        t.equal(app._router.stack.length, 8, 'middleware stack is appropriate length');
+
+        names.forEach(function (name, i) {
+            var handle = app._router.stack[i + 2].handle;
+            t.equal(typeof handle, 'function', 'position ' + i + ' middleware is a function');
+            t.ok(handle.name, 'position ' + i + ' middleware has a name');
+            t.ok(handle.name.match(new RegExp(name, 'g')), 'position ' + i + ' middleware name matches ' + name);
+        });
+        t.end();
+
+    });
+
     t.test('only use enabled middleware', function (t) {
         var config, names, app;
 
         config = require('./fixtures/enabled');
         names = Object.keys(config).filter(function (prop) {
-            return config[prop].enabled;
+            return config[prop].enabled !== false;
         });
 
         app = express();
@@ -246,9 +269,9 @@ test('enabled', function (t) {
         app = express();
         app.use(meddle(config));
 
-        // The final middleware should be the anonymous wrapper created for
+        // The final middleware should be the 'mounted_app' wrapper created for
         // express objects. Otherwise, middleware should be the named wrapper.
-        t.strictEqual(app._router.stack[app._router.stack.length - 1].handle.name, '');
+        t.strictEqual(app._router.stack[app._router.stack.length - 1].handle.name, 'mounted_app');
         t.end();
     });
 
