@@ -127,7 +127,7 @@ function createToggleWrapper(fn, settings) {
 
     name = fn.name || settings.name;
     if (!/^[$_A-Za-z\xa0-\uffff][$_A-Za-z0-9\xa0-\uffff]*$/.test(name)) {
-        throw new SyntaxError('Invalid identifier.');
+        throw new SyntaxError('Invalid identifier of ' + name);
     }
 
     return eval('(' + impl.replace('$name', name) + ')');
