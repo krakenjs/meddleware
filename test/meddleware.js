@@ -163,7 +163,7 @@ test('factories', function (t) {
                 app.use(meddle(config));
             } catch (e) {
                 t.ok(e instanceof SyntaxError, 'error is SyntaxError');
-                t.equal(e.message, 'Invalid identifier.', 'error message specifies invalid identifier');
+                t.equal(e.message, 'Invalid identifier of .invalid.', 'error message specifies invalid identifier');
                 throw e;
             }
         }, SyntaxError);
