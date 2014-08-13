@@ -2,7 +2,10 @@
     "logger": {
         "enabled": true,
         "priority": 1,
-        "module": "morgan"
+        "module": {
+            "name": "morgan",
+            "arguments": [ "combined" ]
+        }
     },
 
     "favicon": {
