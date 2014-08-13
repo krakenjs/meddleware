@@ -16,7 +16,10 @@
     "logger": {
         "enabled": false,
         "priority": 50,
-        "module": "morgan"
+        "module": {
+            "name": "morgan",
+            "arguments": [ "combined" ]
+        }
     },
 
     "json": {
@@ -33,7 +36,8 @@
         "priority": 70,
         "module": {
             "name": "body-parser",
-            "method": "urlencoded"
+            "method": "urlencoded",
+            "arguments": [{ "extended": true }]
         }
     },
 
