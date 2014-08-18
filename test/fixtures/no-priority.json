@@ -10,7 +10,10 @@
 
     "favicon": {
         "enabled": true,
-        "module": "static-favicon"
+        "module": {
+            "name": "serve-favicon",
+            "arguments": [ "path:./fixtures/favicon.ico" ]
+        }
     },
 
     "static": {
