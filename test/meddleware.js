@@ -4,7 +4,19 @@
 var test = require('tape'),
     express = require('express'),
     request = require('supertest'),
+    shortstop = require('shortstop'),
+    handlers = require('shortstop-handlers'),
     meddle = require('../');
+
+function Resolver() {
+    var _resolver = shortstop.create();
+    _resolver.use('path', handlers.path(__dirname));
+    return function (config, cb) {
+        _resolver.resolve(config, cb);
+    };
+}
+
+var resolve = Resolver();
 
 
 test('meddleware', function (t) {
@@ -28,16 +40,18 @@ test('meddleware', function (t) {
         config = require('./fixtures/defaults');
         names = Object.keys(config);
 
-        app = express();
-        app.use(meddle(config));
+        resolve(config, function (err, config) {
+            app = express();
+            app.use(meddle(config));
 
-        t.equal(app._router.stack.length, names.length + 2, 'middleware stack is appropriate length');
-        names.forEach(function (name, i) {
-            var handle = app._router.stack[i + 2].handle;
-            t.equal(typeof handle, 'function', 'middleware is correctly defined');
-            t.ok(handle.name.match(new RegExp(name, 'g')), 'middleware name is correct');
+            t.equal(app._router.stack.length, names.length + 2, 'middleware stack is appropriate length');
+            names.forEach(function (name, i) {
+                var handle = app._router.stack[i + 2].handle;
+                t.equal(typeof handle, 'function', 'middleware is correctly defined');
+                t.ok(handle.name.match(new RegExp(name, 'g')), 'middleware name is correct');
+            });
+            t.end();
         });
-        t.end();
     });
 
 
@@ -46,11 +60,14 @@ test('meddleware', function (t) {
 
         config = require('./fixtures/undefined');
 
-        app = express();
-        app.use(meddle(config));
+        resolve(config, function (err, config) {
+            app = express();
+            app.use(meddle(config));
 
-        t.equal(app._router.stack.length, 6, 'middleware stack is appropriate length');
-        t.end();
+            t.equal(app._router.stack.length, 6, 'middleware stack is appropriate length');
+            t.end();
+        });
+
     });
 
 });
@@ -62,25 +79,27 @@ test('priority', function (t) {
         var config, app, entry;
 
         config = require('./fixtures/no-priority');
-        app = express();
-        app.use(meddle(config));
+        resolve(config, function (err, config) {
+            app = express();
+            app.use(meddle(config));
 
-        entry = app._router.stack[2];
-        t.ok(entry, 'position 2 middleware exists');
-        t.equal(typeof entry.handle, 'function', 'position 2 middleware is a function');
-        t.equal(entry.handle.name, 'favicon', 'position 2 middleware has the expected name');
+            entry = app._router.stack[2];
+            t.ok(entry, 'position 2 middleware exists');
+            t.equal(typeof entry.handle, 'function', 'position 2 middleware is a function');
+            t.equal(entry.handle.name, 'favicon', 'position 2 middleware has the expected name');
 
-        entry = app._router.stack[3];
-        t.ok(entry, 'position 3 middleware exists');
-        t.equal(typeof entry.handle, 'function', 'position 3 middleware is a function');
-        t.equal(entry.handle.name, 'staticMiddleware', 'position 3 middleware has the expected name');
+            entry = app._router.stack[3];
+            t.ok(entry, 'position 3 middleware exists');
+            t.equal(typeof entry.handle, 'function', 'position 3 middleware is a function');
+            t.equal(entry.handle.name, 'staticMiddleware', 'position 3 middleware has the expected name');
 
-        entry = app._router.stack[4];
-        t.ok(entry, 'position 4 middleware exists');
-        t.equal(typeof entry.handle, 'function', 'position 4 middleware is a function');
-        t.equal(entry.handle.name, 'logger', 'position 4 middleware has the expected name');
+            entry = app._router.stack[4];
+            t.ok(entry, 'position 4 middleware exists');
+            t.equal(typeof entry.handle, 'function', 'position 4 middleware is a function');
+            t.equal(entry.handle.name, 'logger', 'position 4 middleware has the expected name');
 
-        t.end();
+            t.end();
+        });
     });
 
 });
@@ -184,18 +203,20 @@ test('enabled', function (t) {
             return config[prop].enabled !== false;
         });
 
-        app = express();
-        app.use(meddle(config));
+        resolve(config, function (err, config) {
+            app = express();
+            app.use(meddle(config));
 
-        t.equal(app._router.stack.length, 8, 'middleware stack is appropriate length');
+            t.equal(app._router.stack.length, 8, 'middleware stack is appropriate length');
 
-        names.forEach(function (name, i) {
-            var handle = app._router.stack[i + 2].handle;
-            t.equal(typeof handle, 'function', 'position ' + i + ' middleware is a function');
-            t.ok(handle.name, 'position ' + i + ' middleware has a name');
-            t.ok(handle.name.match(new RegExp(name, 'g')), 'position ' + i + ' middleware name matches ' + name);
+            names.forEach(function (name, i) {
+                var handle = app._router.stack[i + 2].handle;
+                t.equal(typeof handle, 'function', 'position ' + i + ' middleware is a function');
+                t.ok(handle.name, 'position ' + i + ' middleware has a name');
+                t.ok(handle.name.match(new RegExp(name, 'g')), 'position ' + i + ' middleware name matches ' + name);
+            });
+            t.end();
         });
-        t.end();
 
     });
 
@@ -207,18 +228,20 @@ test('enabled', function (t) {
             return config[prop].enabled !== false;
         });
 
-        app = express();
-        app.use(meddle(config));
+        resolve(config, function (err, config) {
+            app = express();
+            app.use(meddle(config));
 
-        t.equal(app._router.stack.length, 8, 'middleware stack is appropriate length');
+            t.equal(app._router.stack.length, 8, 'middleware stack is appropriate length');
 
-        names.forEach(function (name, i) {
-            var handle = app._router.stack[i + 2].handle;
-            t.equal(typeof handle, 'function', 'position ' + i + ' middleware is a function');
-            t.ok(handle.name, 'position ' + i + ' middleware has a name');
-            t.ok(handle.name.match(new RegExp(name, 'g')), 'position ' + i + ' middleware name matches ' + name);
+            names.forEach(function (name, i) {
+                var handle = app._router.stack[i + 2].handle;
+                t.equal(typeof handle, 'function', 'position ' + i + ' middleware is a function');
+                t.ok(handle.name, 'position ' + i + ' middleware has a name');
+                t.ok(handle.name.match(new RegExp(name, 'g')), 'position ' + i + ' middleware name matches ' + name);
+            });
+            t.end();
         });
-        t.end();
     });
 
 
@@ -284,19 +307,22 @@ test('events', function (t) {
         var config, app, events = 0;
 
         config = require('./fixtures/defaults');
-        app = express();
 
-        app.on('middleware:before', function () {
-            events += 1;
+        resolve(config, function (err, config) {
+            app = express();
+
+            app.on('middleware:before', function () {
+                events += 1;
+            });
+
+            app.on('middleware:after', function () {
+                events += 1;
+            });
+
+            app.use(meddle(config));
+            t.equal(events, 12, 'registration events were triggered');
+            t.end();
         });
-
-        app.on('middleware:after', function () {
-            events += 1;
-        });
-
-        app.use(meddle(config));
-        t.equal(events, 12, 'registration events were triggered');
-        t.end();
     });
 
 
@@ -304,22 +330,24 @@ test('events', function (t) {
         var config, events, app;
 
         config = require('./fixtures/defaults');
-        events = 0;
-        app = express();
+        resolve(config, function (err, config) {
+            events = 0;
+            app = express();
 
-        app.on('middleware:before:favicon', function (eventargs) {
-            t.equal(eventargs.app, app);
-            events += 1;
+            app.on('middleware:before:favicon', function (eventargs) {
+                t.equal(eventargs.app, app);
+                events += 1;
+            });
+
+            app.on('middleware:after:favicon', function (eventargs) {
+                t.equal(eventargs.app, app);
+                events += 1;
+            });
+
+            app.use(meddle(config));
+            t.equal(events, 2, 'registration events were triggered');
+            t.end();
         });
-
-        app.on('middleware:after:favicon', function (eventargs) {
-            t.equal(eventargs.app, app);
-            events += 1;
-        });
-
-        app.use(meddle(config));
-        t.equal(events, 2, 'registration events were triggered');
-        t.end();
     });
 
 });

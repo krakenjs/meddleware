@@ -1,7 +1,10 @@
 {
     "favicon": {
         "priority": 10,
-        "module": "static-favicon"
+        "module": {
+            "name": "serve-favicon",
+            "arguments": [ "path:./fixtures/favicon.ico" ]
+        }
     },
 
     "static": {
