@@ -51,7 +51,6 @@ function resolvery(basedir) {
 
         } else {
             fn = resolveImpl(basedir, spec.module);
-            fn = createToggleWrapper(fn, spec);
         }
 
         return fn;
@@ -98,40 +97,6 @@ function resolveImpl(root, config) {
     return factory.apply(null, args);
 }
 
-
-/**
- * Creates a middleware wrapper for toggling whether the middleware is enabled or disabled at runtime.
- * @param fn the original middleware implementation.
- * @param settings The settings object containing info related to creating an appropriate wrapper.
- * @returns {Function}
- */
-function createToggleWrapper(fn, settings) {
-    /*jshint evil:true, multistr:true*/
-    var name, impl;
-
-    // Do not wrap express objects
-    if (util.isExpress(fn)) {
-        return fn;
-    }
-
-    // If the function arity is 4 then account for error handler
-    if (fn.length === 4) {
-        impl = 'function $name(err, req, res, next) { \
-            !(\'enabled\' in settings) || settings.enabled ? fn(err, req, res, next) : next(err); \
-        }';
-    } else {
-        impl = 'function $name(req, res, next) { \
-            !(\'enabled\' in settings) || settings.enabled ? fn(req, res, next) : next(); \
-        }';
-    }
-
-    name = fn.name || settings.name;
-    if (!/^[$_A-Za-z\xa0-\uffff][$_A-Za-z0-9\xa0-\uffff]*$/.test(name)) {
-        throw new SyntaxError('Invalid identifier of ' + name);
-    }
-
-    return eval('(' + impl.replace('$name', name) + ')');
-}
 
 
 /**
@@ -202,6 +167,10 @@ module.exports = function meddleware(settings) {
             .sort(compare)
             .forEach(function register(spec) {
                 var fn, eventargs, route;
+
+                if (!spec.enabled && 'enabled' in spec) {
+                    return;
+                }
 
                 fn = resolve(spec, spec.name);
                 eventargs = { app: parent, config: spec };

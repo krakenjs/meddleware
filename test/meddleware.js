@@ -170,26 +170,6 @@ test('factories', function (t) {
         t.end();
     });
 
-
-    t.test('throw on invalid identifier', function (t) {
-        var config, app;
-
-        config = require('./fixtures/invalid');
-
-        t.throws(function () {
-            try {
-                app = express();
-                app.use(meddle(config));
-            } catch (e) {
-                t.ok(e instanceof SyntaxError, 'error is SyntaxError');
-                t.equal(e.message, 'Invalid identifier of .invalid.', 'error message specifies invalid identifier');
-                throw e;
-            }
-        }, SyntaxError);
-
-        t.end();
-    });
-
 });
 
 
@@ -207,7 +187,7 @@ test('enabled', function (t) {
             app = express();
             app.use(meddle(config));
 
-            t.equal(app._router.stack.length, 8, 'middleware stack is appropriate length');
+            t.equal(app._router.stack.length, 3, 'middleware stack is appropriate length');
 
             names.forEach(function (name, i) {
                 var handle = app._router.stack[i + 2].handle;
@@ -232,7 +212,7 @@ test('enabled', function (t) {
             app = express();
             app.use(meddle(config));
 
-            t.equal(app._router.stack.length, 8, 'middleware stack is appropriate length');
+            t.equal(app._router.stack.length, 3, 'middleware stack is appropriate length');
 
             names.forEach(function (name, i) {
                 var handle = app._router.stack[i + 2].handle;
@@ -242,60 +222,6 @@ test('enabled', function (t) {
             });
             t.end();
         });
-    });
-
-
-    t.test('disable middleware at runtime', function (t) {
-        var config, app;
-
-        config = require('./fixtures/toggle');
-        app = express();
-        app.use(meddle(config));
-
-        t.equal(app._router.stack.length, 6, 'middleware stack is appropriate length');
-
-        function req(cb) {
-            var server;
-            server = request(app)
-                .get('/')
-                .set('Accept', 'application/json')
-                .expect('Content-Type', /json/)
-                .end(function (err, res) {
-                    t.error(err, 'no response error');
-                    t.equal(typeof res, 'object', 'response is defined');
-                    t.equal(typeof res.body, 'object', 'response body is defined');
-                    cb(res.body);
-                });
-        }
-
-        req(function (res) {
-            t.equal(res.a, 'a', '"a" is defined');
-            t.equal(res.b, 'b', '"b" is defined');
-
-            // Disable middleware
-            config.b.enabled = false;
-
-            req(function (res) {
-                t.equal(res.a, 'a', '"a" is still defined');
-                t.equal(res.b, undefined, '"b" is no longer defined');
-                t.end();
-            });
-        });
-
-    });
-
-
-    t.test('ignore express objects', function (t) {
-        var config, app;
-
-        config = require('./fixtures/toggle');
-        app = express();
-        app.use(meddle(config));
-
-        // The final middleware should be the 'mounted_app' wrapper created for
-        // express objects. Otherwise, middleware should be the named wrapper.
-        t.strictEqual(app._router.stack[app._router.stack.length - 1].handle.name, 'mounted_app');
-        t.end();
     });
 
 });
