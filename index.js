@@ -94,7 +94,7 @@ function resolveImpl(root, config) {
     }
 
     args = thing.isArray(config['arguments']) ? config['arguments'] : [];
-    return factory.apply(null, args);
+    return factory.apply(module, args);
 }
 
 
