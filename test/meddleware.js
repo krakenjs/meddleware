@@ -546,3 +546,36 @@ test('composition', function (t) {
     });
 
 });
+
+test('use module as context in factory method', function (t) {
+    t.test('context', function (t) {
+        var config, app;
+
+        function req(route, cb) {
+            var server;
+            server = request(app)
+                .get(route)
+                .end(function (err, res) {
+                    t.error(err, 'no response error');
+                    t.equal(typeof res, 'object', 'response is defined');
+                    t.equal(typeof res.body, 'object', 'response body is defined');
+                    cb(res.body);
+                });
+        }
+
+        config = require('./fixtures/context');
+
+        app = express();
+        app.use(meddle(config));
+
+        app.get('/', function (req, res) {
+            t.ok(res.locals.selfWasCalled,
+                'The method was called with a scope');
+            res.status(200).end();
+        });
+
+        req('/', function () {
+            t.end();
+        });
+    });
+});
