@@ -48,7 +48,7 @@ test('meddleware', function (t) {
             names.forEach(function (name, i) {
                 var handle = app._router.stack[i + 2].handle;
                 t.equal(typeof handle, 'function', 'middleware is correctly defined');
-                t.ok(handle.name.match(new RegExp(name, 'ig')), 'middleware name is correct');
+                t.ok(handle.name.match(new RegExp(name, 'i')), 'middleware name is correct');
             });
             t.end();
         });
@@ -86,17 +86,17 @@ test('priority', function (t) {
             entry = app._router.stack[2];
             t.ok(entry, 'position 2 middleware exists');
             t.equal(typeof entry.handle, 'function', 'position 2 middleware is a function');
-            t.ok(entry.handle.name.match(/favicon/ig), 'position 2 middleware has the expected name');
+            t.ok(entry.handle.name.match(/favicon/i), 'position 2 middleware has the expected name');
 
             entry = app._router.stack[3];
             t.ok(entry, 'position 3 middleware exists');
             t.equal(typeof entry.handle, 'function', 'position 3 middleware is a function');
-            t.ok(entry.handle.name.match(/static/ig), 'position 3 middleware has the expected name');
+            t.ok(entry.handle.name.match(/static/i), 'position 3 middleware has the expected name');
 
             entry = app._router.stack[4];
             t.ok(entry, 'position 4 middleware exists');
             t.equal(typeof entry.handle, 'function', 'position 4 middleware is a function');
-            t.ok(entry.handle.name.match(/logger/ig), 'position 4 middleware has the expected name');
+            t.ok(entry.handle.name.match(/logger/i), 'position 4 middleware has the expected name');
 
             t.end();
         });
