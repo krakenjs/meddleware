@@ -1,6 +1,6 @@
 {
     "simultaneous": {
-    "enabled": true,
+        "enabled": true,
         "priority": 50,
         "race": {
             "middlewareA": {
