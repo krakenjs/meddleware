@@ -33,6 +33,10 @@ lib-cov
 html-report
 xunit.xml
 
+.travis.yml
+.eslintrc
+.jshintrc
+.npmignore
 .project
 .idea
 .settings
