@@ -1,0 +1,10 @@
+{
+    "testMiddlewareContext": {
+        "enabled": true,
+        "priority": 10,
+        "module": {
+            "name": "./fixtures/middleware/context",
+            "method": "run"
+        }
+    }
+}
