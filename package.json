@@ -30,7 +30,7 @@
     "jshint": "^2.5.0",
     "morgan": "^1.0.0",
     "serve-favicon": "^2.0.1",
-    "serve-static": "^1.0.4",
+    "serve-static": "^1.5.4",
     "shortstop": "^1.0.1",
     "shortstop-handlers": "^1.0.0",
     "supertest": "^0.11.0",

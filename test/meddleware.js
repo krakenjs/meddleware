@@ -91,7 +91,7 @@ test('priority', function (t) {
             entry = app._router.stack[3];
             t.ok(entry, 'position 3 middleware exists');
             t.equal(typeof entry.handle, 'function', 'position 3 middleware is a function');
-            t.equal(entry.handle.name, 'staticMiddleware', 'position 3 middleware has the expected name');
+            t.equal(entry.handle.name, 'serveStatic', 'position 3 middleware has the expected name');
 
             entry = app._router.stack[4];
             t.ok(entry, 'position 4 middleware exists');
