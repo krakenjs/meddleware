@@ -89,7 +89,7 @@ to `Number.MIN_VALUE`.
 
     - `arguments` (*array*, optional) - An array of arguments to pass to the middleware factory.
 
-- `route` (*string*, optional) - An express route against which the middleware should be registered.
+- `route` (*string*, *RegExp*, optional) - An express route against which the middleware should be registered. Please note that—if configuring `meddleware` with json files—you'll need to use something like [shortstop](https://github.com/krakenjs/shortstop) with [shortstop-regex](https://github.com/jsisk/shortstop-regex) to convert a string to RegExp.
 
 - `parallel` (*object*, optional) - A meddleware configuration object containing middleware which should be executed in parallel, proceeding only when all have completed.
 
