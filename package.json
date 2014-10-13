@@ -34,6 +34,7 @@
     "serve-static": "^1.0.4",
     "shortstop": "^1.0.1",
     "shortstop-handlers": "^1.0.0",
+    "shortstop-regex": "0.0.1",
     "supertest": "^0.11.0",
     "tape": "^2.12.3"
   },
