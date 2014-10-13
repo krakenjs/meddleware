@@ -6,11 +6,13 @@ var test = require('tape'),
     request = require('supertest'),
     shortstop = require('shortstop'),
     handlers = require('shortstop-handlers'),
+    ssRegex = require('shortstop-regex'),
     meddle = require('../');
 
 function Resolver() {
     var _resolver = shortstop.create();
     _resolver.use('path', handlers.path(__dirname));
+    _resolver.use('regex', ssRegex());
     return function (config, cb) {
         _resolver.resolve(config, cb);
     };
@@ -333,36 +335,50 @@ test('routes', function (t) {
         }
 
         config = require('./fixtures/routes');
+        resolve(config, function (err, config) {
+            app = express();
+            app.use(meddle(config));
 
-        app = express();
-        app.use(meddle(config));
+            app.get('/', function (req, res) {
+                t.notOk(res.locals.routeA);
+                t.ok(res.locals.routeB);
+                t.notOk(res.locals.routeC);
+                t.notOk(res.locals.routeD);
+                res.status(200).end();
+            });
 
-        app.get('/', function (req, res) {
-            t.notOk(res.locals.routeA);
-            t.ok(res.locals.routeB);
-            t.notOk(res.locals.routeC);
-            res.status(200).end();
-        });
+            app.get('/foo', function (req, res) {
+                t.ok(res.locals.routeA);
+                t.ok(res.locals.routeB);
+                t.notOk(res.locals.routeC);
+                t.notOk(res.locals.routeD);
+                res.status(200).end();
+            });
 
-        app.get('/foo', function (req, res) {
-            t.ok(res.locals.routeA);
-            t.ok(res.locals.routeB);
-            t.notOk(res.locals.routeC);
-            res.status(200).end();
-        });
+            app.get('/bar', function (req, res) {
+                t.notOk(res.locals.routeA);
+                t.ok(res.locals.routeB);
+                t.ok(res.locals.routeC);
+                t.notOk(res.locals.routeD);
+                res.status(200).end();
+            });
 
-        app.get('/bar', function (req, res) {
-            t.notOk(res.locals.routeA);
-            t.ok(res.locals.routeB);
-            t.ok(res.locals.routeC);
-            res.status(200).end();
-        });
+            app.get('/baz', function (req, res) {
+                t.notOk(res.locals.routeC);
+                t.notOk(res.locals.routeA);
+                t.ok(res.locals.routeB);
+                t.ok(res.locals.routeD);
+                res.status(200).end();
+            });
 
-        // trololol
-        req('/', function () {
-            req('/foo', function () {
-                req('/bar', function () {
-                    t.end();
+            // trololol
+            req('/', function () {
+                req('/foo', function () {
+                    req('/bar', function () {
+                        req('/baz', function () {
+                            t.end();
+                        });
+                    });
                 });
             });
         });
