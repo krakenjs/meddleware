@@ -175,8 +175,8 @@ module.exports = function meddleware(settings) {
                 fn = resolve(spec, spec.name);
                 eventargs = { app: parent, config: spec };
 
-                route = mountpath;
-                if (typeof spec.route === 'string') {
+                route = thing.isRegExp(spec.route) ? spec.route : mountpath;
+                if (thing.isString(spec.route)) {
                     route += route[route.length - 1] !== '/' ? '/' : '';
                     route += spec.route[0] === '/' ? spec.route.slice(1) : spec.route;
                 }
