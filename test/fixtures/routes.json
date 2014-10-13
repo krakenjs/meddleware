@@ -26,5 +26,15 @@
             "method": "routeC"
         },
         "route": "bar"
+    },
+
+    "routeD": {
+        "enabled": true,
+        "priority": 80,
+        "module": {
+            "name": "./fixtures/middleware/routes",
+            "method": "routeD"
+        },
+        "route": "regex:^\/baz$"
     }
 }

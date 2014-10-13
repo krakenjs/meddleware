@@ -24,3 +24,10 @@ exports.routeC = function () {
         next();
     };
 };
+
+exports.routeD = function () {
+    return function routeC(req, res, next) {
+        res.locals.routeD = true;
+        next();
+    };
+};
