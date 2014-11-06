@@ -43,7 +43,7 @@ http.createServer(app).listen(8080);
         "priority": 30,
         "route": "/foo",
         "module": {
-            "name": "./lib/middleware",
+            "name": "path:./lib/middleware",
             "method": "customMiddleware",
             "arguments": [ "foo", { "bar": "baz" } ]
         }
