@@ -292,3 +292,8 @@ $ npm test
 ````bash
 $ npm run cover && open coverage/lcov-report/index.html
 ```
+
+#### Breaking changes
+
+* `v2.0.0` removed `toggle` function from middleware. Middleware is enabled at configuration time only, not toggled at runtime.
+* `v3.0.0` removed the default time limit on parallel middlewares, and made middlewares enabled by default.
