@@ -40,8 +40,8 @@
   },
   "dependencies": {
     "caller": "0.0.1",
-    "debuglog": "0.0.4",
-    "core-util-is": "^1.0.1"
+    "core-util-is": "^1.0.1",
+    "dbrickashaw": "^5.0.1"
   },
   "repository": {
     "type": "git",

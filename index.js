@@ -19,10 +19,12 @@ var path = require('path');
 var caller = require('caller');
 var express = require('express');
 var thing = require('core-util-is');
-var debug = require('debuglog')('meddleware');
+var Dbrickashaw = require('dbrickashaw');
 var RQ = require('./lib/rq');
 var util = require('./lib/util');
 
+
+var log = Dbrickashaw.createLogger();
 
 /**
  * Creates a middleware resolver based on the provided basedir.
@@ -75,7 +77,7 @@ function resolveImpl(root, config) {
         throw new TypeError('Module not defined.');
     }
 
-    debug('loading module', config.name);
+    log.debug('load', config.name);
 
     // Check the initial module, then try to resolve it to an absolute path and check again.
     modulePath = util.tryResolve(config.name) || util.tryResolve(path.resolve(root, config.name));
@@ -181,7 +183,7 @@ module.exports = function meddleware(settings) {
                     route += spec.route[0] === '/' ? spec.route.slice(1) : spec.route;
                 }
 
-                debug('registering', spec.name, 'middleware');
+                log.debug('register', spec.name);
 
                 parent.emit('middleware:before', eventargs);
                 parent.emit('middleware:before:' + spec.name, eventargs);
@@ -195,3 +197,5 @@ module.exports = function meddleware(settings) {
     app.once('mount', onmount);
     return app;
 };
+
+module.exports.publisher = Dbrickashaw.getPublisher();
