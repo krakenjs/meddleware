@@ -3,7 +3,7 @@ meddleware
 
 Lead Maintainer: [Jean-Charles Sisk](https://github.com/jasisk)  
 
-[![Build Status](https://travis-ci.org/krakenjs/meddleware.svg?branch=v3.0.0)](https://travis-ci.org/krakenjs/meddleware)  
+[![Build Status](https://travis-ci.org/krakenjs/meddleware.svg?branch=v3.x)](https://travis-ci.org/krakenjs/meddleware)  
 
 
 Configuration-based middleware registration for express.
