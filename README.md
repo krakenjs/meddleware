@@ -182,15 +182,15 @@ Middleware designated as `parallel` will all be executed simultaneously, continu
         "parallel": {
             "service1": {
                 "enabled": true,
-                "module": "path:./lib/middleware/service1"
+                "module": "./lib/middleware/service1"
             },
             "service2": {
                 "enabled": true,
-                "module": "path:./lib/middleware/service2"
+                "module": "./lib/middleware/service2"
             },
             "service3": {
                 "enabled": true,
-                "module": "path:./lib/middleware/service3"
+                "module": "./lib/middleware/service3"
             }
         }
     },
@@ -224,11 +224,11 @@ Middleware designated as `race` will all be executed simultaneously, continuing 
         "race": {
             "service1a": {
                 "enabled": true,
-                "module": "path:./lib/middleware/service1a"
+                "module": "./lib/middleware/service1a"
             },
             "service1b": {
                 "enabled": true,
-                "module": "path:./lib/middleware/service1b"
+                "module": "./lib/middleware/service1b"
             }
         }
     },
@@ -263,12 +263,12 @@ Middleware designated as `fallback` will execute each middleware in series until
             "primaryService": {
                 "enabled": true,
                 "priority": 10,
-                "module": "path:./lib/middleware/primaryService"
+                "module": "./lib/middleware/primaryService"
             },
             "secondaryService": {
                 "enabled": true,
                 "priority": 20,
-                "module": "path:./lib/middleware/secondaryService"
+                "module": "./lib/middleware/secondaryService"
             }
         }
     },
