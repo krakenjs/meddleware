@@ -197,8 +197,14 @@ module.exports = function meddleware(settings) {
                 fn = resolve(spec, spec.name);
                 eventargs = { app: parent, config: spec };
 
-                route = normalize(mountpath, spec.route);
-
+                if (thing.isArray(spec.route)) {
+                    route = spec.route.map(function (route) {
+                        return normalize(mountpath, route);
+                    });
+                } else {
+                    route = normalize(mountpath, spec.route);
+                }
+                
                 debug('registering', spec.name, 'middleware');
 
                 parent.emit('middleware:before', eventargs);
