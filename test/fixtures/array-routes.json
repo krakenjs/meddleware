@@ -1,0 +1,40 @@
+{
+    "routeA": {
+        "enabled": true,
+        "priority": 50,
+        "module": {
+            "name": "./fixtures/middleware/routes",
+            "method": "routeA"
+        },
+        "route": ["/foo"]
+    },
+
+    "routeB": {
+        "enabled": true,
+        "priority": 60,
+        "module": {
+            "name": "./fixtures/middleware/routes",
+            "method": "routeB"
+        }
+    },
+
+    "routeC": {
+        "enabled": true,
+        "priority": 70,
+        "module": {
+            "name": "./fixtures/middleware/routes",
+            "method": "routeC"
+        },
+        "route": [ "/foo", "/bar" ]
+    },
+
+    "routeD": {
+        "enabled": true,
+        "priority": 80,
+        "module": {
+            "name": "./fixtures/middleware/routes",
+            "method": "routeD"
+        },
+        "route": [ "/bar", "regex:^\/baz$" ]
+    }
+}
