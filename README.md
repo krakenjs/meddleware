@@ -54,9 +54,19 @@ http.createServer(app).listen(8080);
         }
     },
 
+    "security": {
+        "enabled": true,
+        "priority": 40,
+        "route": [ "/foo", "/bar" ],
+        "module": {
+            "name": "./lib/security",
+            "arguments": [ { "maximum": true } ]
+        }
+    },
+
     "cookieParser": {
         "enabled": false,
-        "priority": 40,
+        "priority": 50,
         "module": {
             "name": "cookie-parser",
             "arguments": [ "keyboard cat" ]
@@ -64,7 +74,7 @@ http.createServer(app).listen(8080);
     },
 
     "misc": {
-        "priority": 50,
+        "priority": 60,
         "parallel": {
             "user": {
                 "enabled": true,
@@ -86,7 +96,7 @@ http.createServer(app).listen(8080);
 are registered first, while higher numbers are registered later. If `priority` is not a number, this setting defaults
 to `Number.MIN_VALUE`.
 
-- `module` (*object*, *string*) - The name or definition of the module to load containing the middleware implementation. Can be an installed module or a path to a module file within your project/application.
+- `module` (*object* **or** *string*) - The name or definition of the module to load containing the middleware implementation. Can be an installed module or a path to a module file within your project/application.
 
     - `name` (*string*) - The name of the module or path to local module.
 
@@ -94,7 +104,32 @@ to `Number.MIN_VALUE`.
 
     - `arguments` (*array*, optional) - An array of arguments to pass to the middleware factory.
 
-- `route` (*string*, *RegExp*, optional) - An express route against which the middleware should be registered. Please note that—if configuring `meddleware` with json files—you'll need to use something like [shortstop](https://github.com/krakenjs/shortstop) with [shortstop-regex](https://github.com/jasisk/shortstop-regex) to convert a string to RegExp.
+- `route` (*string* **or** *array* **or** *regexp*, optional) - An express route against which the middleware should be registered. Can be a string or a regular expression, or an array consisting of strings and regular expressions.
+
+  ##### Caveats
+
+  1. If configuring meddleware with json files, you'll need to use something like [shortstop](https://github.com/krakenjs/shortstop) with [shortstop-regex](https://github.com/jasisk/shortstop-regex) to convert a `string` to `RegExp`.
+
+  2. String paths will be automatically prefixed with any `mountpath` but regular expressions will not.
+
+    ``` js
+    var config = {
+      myMiddleware: {
+        module: './myMiddleware',
+        route: '/foo'
+      },
+      otherMiddleware: {
+        module: './otherMiddleware',
+        route: /^\/bar$/i
+      }
+    }
+
+    app.use('/baz', meddleware(config));
+
+    // `myMiddleware` will run on `/baz/foo`
+    // `otherMiddleware` will run on `/bar`
+    ```
+
 
 - `parallel` (*object*, optional) - A meddleware configuration object containing middleware which should be executed in parallel, proceeding only when all have completed.
 

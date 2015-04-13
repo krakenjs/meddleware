@@ -144,6 +144,28 @@ function compare(a, b) {
 }
 
 
+/**
+ * Normalize string routes
+ * @param mountpath
+ * @param route
+ * @returns {string}
+ */
+function normalize(mountpath, route) {
+
+    if (thing.isRegExp(route)) {
+        // we cannot normalize regexes
+        return route;
+    }
+
+    if (thing.isString(route)) {
+        mountpath += mountpath[mountpath.length - 1] !== '/' ? '/' : '';
+        mountpath += route[0] === '/' ? route.slice(1) : route;
+    }
+
+    return mountpath;
+}
+
+
 module.exports = function meddleware(settings) {
     var basedir, app;
 
@@ -175,12 +197,14 @@ module.exports = function meddleware(settings) {
                 fn = resolve(spec, spec.name);
                 eventargs = { app: parent, config: spec };
 
-                route = thing.isRegExp(spec.route) ? spec.route : mountpath;
-                if (thing.isString(spec.route)) {
-                    route += route[route.length - 1] !== '/' ? '/' : '';
-                    route += spec.route[0] === '/' ? spec.route.slice(1) : spec.route;
+                if (thing.isArray(spec.route)) {
+                    route = spec.route.map(function (route) {
+                        return normalize(mountpath, route);
+                    });
+                } else {
+                    route = normalize(mountpath, spec.route);
                 }
-
+                
                 debug('registering', spec.name, 'middleware');
 
                 parent.emit('middleware:before', eventargs);
