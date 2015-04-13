@@ -408,7 +408,6 @@ test('routes', function (t) {
         app.use('/bam', meddle(config));
 
         app.get('/bam', function (req, res) {
-            console.log(res.locals);
             t.notOk(res.locals.routeA);
             t.ok(res.locals.routeB);
             t.notOk(res.locals.routeC);
@@ -416,7 +415,6 @@ test('routes', function (t) {
         });
 
         app.get('/bam/foo', function (req, res) {
-            console.log(res.locals);
             t.ok(res.locals.routeA);
             t.ok(res.locals.routeB);
             t.notOk(res.locals.routeC);
