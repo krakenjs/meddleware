@@ -54,9 +54,19 @@ http.createServer(app).listen(8080);
         }
     },
 
+    "security": {
+        "enabled": true,
+        "priority": 40,
+        "route": [ "/foo", "/bar" ],
+        "module": {
+            "name": "./lib/security",
+            "arguments": [ { "maximum": true } ]
+        }
+    },
+
     "cookieParser": {
         "enabled": false,
-        "priority": 40,
+        "priority": 50,
         "module": {
             "name": "cookie-parser",
             "arguments": [ "keyboard cat" ]
@@ -64,7 +74,7 @@ http.createServer(app).listen(8080);
     },
 
     "misc": {
-        "priority": 50,
+        "priority": 60,
         "parallel": {
             "user": {
                 "enabled": true,
