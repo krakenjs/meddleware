@@ -460,6 +460,7 @@ test('routes', function (t) {
             var server;
             server = request(app)
                 .get(route)
+                .expect(200)
                 .end(function (err, res) {
                     t.error(err, 'no response error');
                     t.equal(typeof res, 'object', 'response is defined');
@@ -473,23 +474,21 @@ test('routes', function (t) {
         app = express();
         app.use('/bam', meddle(config));
 
-        app.get('/', function (req, res) {
-            console.log(res.locals);
+        app.get('/bam', function (req, res) {
             t.notOk(res.locals.routeA);
             t.ok(res.locals.routeB);
             t.notOk(res.locals.routeC);
             res.status(200).end();
         });
 
-        app.get('/foo', function (req, res) {
-            console.log(res.locals);
+        app.get('/bam/foo', function (req, res) {
             t.ok(res.locals.routeA);
             t.ok(res.locals.routeB);
             t.notOk(res.locals.routeC);
             res.status(200).end();
         });
 
-        app.get('/bar', function (req, res) {
+        app.get('/bam/bar', function (req, res) {
             t.notOk(res.locals.routeA);
             t.ok(res.locals.routeB);
             t.ok(res.locals.routeC);
