@@ -23,3 +23,10 @@ exports.middlewareC = function () {
         setTimeout(next, 100);
     };
 };
+
+exports.middlewareD = function () {
+    return function parallelC(req, res, next) {
+        res.locals.parallelD = true;
+        next();
+    };
+};
