@@ -604,6 +604,7 @@ test('composition', function (t) {
             t.ok(res.locals.parallelA);
             t.ok(res.locals.parallelB);
             t.ok(res.locals.parallelC);
+            t.notOk(res.locals.parallelD);
             res.status(200).end();
         });
 

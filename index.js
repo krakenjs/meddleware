@@ -33,6 +33,10 @@ function resolvery(basedir) {
     return function resolve(spec, name) {
         var fns, fn;
 
+        if (!spec.enabled && 'enabled' in spec) {
+            return;
+        }
+
         spec.name = spec.name || name;
 
         if (spec.parallel) {
@@ -106,6 +110,7 @@ function resolveImpl(root, config) {
  * @returns {Function}
  */
 function middleware(requestory, fns) {
+    fns = fns.filter(function (fn) { return !!fn; });
     var rq = requestory(fns.map(taskery));
     return function composite(req, res, next) {
         function complete(success, failure) {
@@ -190,11 +195,10 @@ module.exports = function meddleware(settings) {
             .forEach(function register(spec) {
                 var fn, eventargs, route;
 
-                if (!spec.enabled && 'enabled' in spec) {
+                if (!(fn = resolve(spec, spec.name))) {
                     return;
                 }
 
-                fn = resolve(spec, spec.name);
                 eventargs = { app: parent, config: spec };
 
                 if (thing.isArray(spec.route)) {

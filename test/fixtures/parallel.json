@@ -42,6 +42,13 @@
                     "name": "./fixtures/middleware/parallel",
                     "method": "middlewareC"
                 }
+            },
+            "middlewareD": {
+                "enabled": false,
+                "module": {
+                    "name": "./fixtures/middleware/parallel",
+                    "method": "middlewareD"
+                }
             }
         }
     }
