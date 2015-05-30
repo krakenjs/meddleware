@@ -149,28 +149,6 @@ function compare(a, b) {
 }
 
 
-/**
- * Normalize string routes
- * @param mountpath
- * @param route
- * @returns {string}
- */
-function normalize(mountpath, route) {
-
-    if (thing.isRegExp(route)) {
-        // we cannot normalize regexes
-        return route;
-    }
-
-    if (thing.isString(route)) {
-        mountpath += mountpath[mountpath.length - 1] !== '/' ? '/' : '';
-        mountpath += route[0] === '/' ? route.slice(1) : route;
-    }
-
-    return mountpath;
-}
-
-
 module.exports = function meddleware(settings) {
     var basedir, app;
 
