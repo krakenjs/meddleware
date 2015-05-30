@@ -18,6 +18,26 @@ function Resolver() {
     };
 }
 
+
+function getRouter(app) {
+    var length = app._router.stack.length;
+    return app._router.stack[length - 1].handle;
+}
+
+
+function defaultStackSize() {
+    var ephemeral;
+
+    if (typeof defaultStackSize._size === 'number') {
+        return defaultStackSize._size;
+    }
+
+    ephemeral = express();
+    ephemeral.lazyrouter();
+
+    return (defaultStackSize._size = ephemeral._router.stack.length);
+}
+
 var resolve = Resolver();
 
 
@@ -29,7 +49,7 @@ test('meddleware', function (t) {
         app = express();
         app.use(meddle(require('./fixtures/empty')));
 
-        t.equal(app._router.stack.length, 2, 'app middleware stack length is default length');
+        t.equal(app._router.stack.length, defaultStackSize() + 1, 'app middleware stack length is default length');
         t.equal(app._router.stack[0].handle.name, 'query', 'middleware stack contains default "query" middleware');
         t.equal(app._router.stack[1].handle.name, 'expressInit', 'middleware stack contains default "expressInit" middleware');
         t.end();
@@ -37,7 +57,7 @@ test('meddleware', function (t) {
 
 
     t.test('built-in middleware config', function (t) {
-        var config, names, app;
+        var config, names, app, router;
 
         config = require('./fixtures/defaults');
         names = Object.keys(config);
@@ -46,9 +66,11 @@ test('meddleware', function (t) {
             app = express();
             app.use(meddle(config));
 
-            t.equal(app._router.stack.length, names.length + 2, 'middleware stack is appropriate length');
+            router = getRouter(app);
+            t.equal(app._router.stack.length, defaultStackSize() + 1, 'middleware stack is appropriate length');
+            t.equal(router.stack.length, names.length, 'router stack is appropriate length');
             names.forEach(function (name, i) {
-                var handle = app._router.stack[i + 2].handle;
+                var handle = router.stack[i].handle;
                 t.equal(typeof handle, 'function', 'middleware is correctly defined');
                 t.ok(handle.name.match(new RegExp(name, 'i')), 'middleware name is correct');
             });
@@ -66,7 +88,7 @@ test('meddleware', function (t) {
             app = express();
             app.use(meddle(config));
 
-            t.equal(app._router.stack.length, 6, 'middleware stack is appropriate length');
+            t.equal(getRouter(app).stack.length, 4, 'middleware stack is appropriate length');
             t.end();
         });
 
@@ -78,27 +100,28 @@ test('meddleware', function (t) {
 test('priority', function (t) {
 
     t.test('no priority', function (t) {
-        var config, app, entry;
+        var config, app, entry, router;
 
         config = require('./fixtures/no-priority');
         resolve(config, function (err, config) {
             app = express();
             app.use(meddle(config));
 
-            entry = app._router.stack[2];
+            router = getRouter(app);
+            entry = router.stack[0];
+            t.ok(entry, 'position 0 middleware exists');
+            t.equal(typeof entry.handle, 'function', 'position 0 middleware is a function');
+            t.ok(entry.handle.name.match(/favicon/i), 'position 0 middleware has the expected name');
+
+            entry = router.stack[1];
+            t.ok(entry, 'position 1 middleware exists');
+            t.equal(typeof entry.handle, 'function', 'position 1 middleware is a function');
+            t.ok(entry.handle.name.match(/static/i), 'position 1 middleware has the expected name');
+
+            entry = router.stack[2];
             t.ok(entry, 'position 2 middleware exists');
             t.equal(typeof entry.handle, 'function', 'position 2 middleware is a function');
-            t.ok(entry.handle.name.match(/favicon/i), 'position 2 middleware has the expected name');
-
-            entry = app._router.stack[3];
-            t.ok(entry, 'position 3 middleware exists');
-            t.equal(typeof entry.handle, 'function', 'position 3 middleware is a function');
-            t.ok(entry.handle.name.match(/static/i), 'position 3 middleware has the expected name');
-
-            entry = app._router.stack[4];
-            t.ok(entry, 'position 4 middleware exists');
-            t.equal(typeof entry.handle, 'function', 'position 4 middleware is a function');
-            t.ok(entry.handle.name.match(/logger/i), 'position 4 middleware has the expected name');
+            t.ok(entry.handle.name.match(/logger/i), 'position 2 middleware has the expected name');
 
             t.end();
         });
@@ -155,16 +178,18 @@ test('module', function (t) {
 test('factories', function (t) {
 
     t.test('custom middleware factories', function (t) {
-        var config, names, app;
+        var config, names, app, router;
 
         config = require('./fixtures/factories');
         names = Object.keys(config);
         app = express();
         app.use(meddle(config));
 
-        t.equal(app._router.stack.length, names.length + 2, 'middleware stack is correct length');
+        router = getRouter(app);
+
+        t.equal(router.stack.length, names.length, 'middleware stack is correct length');
         names.forEach(function (name, i) {
-            var handle = app._router.stack[i + 2].handle;
+            var handle = router.stack[i].handle;
             t.equal(typeof handle, 'function', 'position ' + i + ' middleware is a function');
             t.ok(handle.name, 'position ' + i + ' middleware has a name');
             t.ok(handle.name.match(new RegExp(name, 'g')), 'position ' + i + ' middleware name matches ' + name);
@@ -178,7 +203,7 @@ test('factories', function (t) {
 test('enabled', function (t) {
 
     t.test('default to enabled', function (t) {
-        var config, names, app;
+        var config, names, app, router;
 
         config = require('./fixtures/disabled');
         names = Object.keys(config).filter(function (prop) {
@@ -189,10 +214,12 @@ test('enabled', function (t) {
             app = express();
             app.use(meddle(config));
 
-            t.equal(app._router.stack.length, 3, 'middleware stack is appropriate length');
+            router = getRouter(app);
+
+            t.equal(router.stack.length, 1, 'middleware stack is appropriate length');
 
             names.forEach(function (name, i) {
-                var handle = app._router.stack[i + 2].handle;
+                var handle = router.stack[i].handle;
                 t.equal(typeof handle, 'function', 'position ' + i + ' middleware is a function');
                 t.ok(handle.name, 'position ' + i + ' middleware has a name');
                 t.ok(handle.name.match(new RegExp(name, 'g')), 'position ' + i + ' middleware name matches ' + name);
@@ -203,7 +230,7 @@ test('enabled', function (t) {
     });
 
     t.test('only use enabled middleware', function (t) {
-        var config, names, app;
+        var config, names, app, router;
 
         config = require('./fixtures/enabled');
         names = Object.keys(config).filter(function (prop) {
@@ -214,10 +241,12 @@ test('enabled', function (t) {
             app = express();
             app.use(meddle(config));
 
-            t.equal(app._router.stack.length, 3, 'middleware stack is appropriate length');
+            router = getRouter(app);
+
+            t.equal(router.stack.length, 1, 'middleware stack is appropriate length');
 
             names.forEach(function (name, i) {
-                var handle = app._router.stack[i + 2].handle;
+                var handle = router.stack[i].handle;
                 t.equal(typeof handle, 'function', 'position ' + i + ' middleware is a function');
                 t.ok(handle.name, 'position ' + i + ' middleware has a name');
                 t.ok(handle.name.match(new RegExp(name, 'g')), 'position ' + i + ' middleware name matches ' + name);
@@ -284,7 +313,7 @@ test('events', function (t) {
 test('error middleware', function (t) {
 
     t.test('arity of 4', function (t) {
-        var config, app;
+        var config, app, router;
 
         function req(route, cb) {
             var server;
@@ -302,12 +331,17 @@ test('error middleware', function (t) {
 
         app = express();
 
-        // Putting the route before meddle() to ensure the router is seen first
-        app.get('/', function (req, res) {
+
+        app.use(meddle(config));
+
+        router = getRouter(app);
+
+        router.get('/', function (req, res) {
             throw new Error('Oh noes!');
         });
 
-        app.use(meddle(config));
+        // Putting the route before meddle() to ensure the router is seen first
+        router.stack.unshift(router.stack.pop());
 
         req('/', function () {
             t.end();
@@ -553,9 +587,9 @@ test('routes', function (t) {
                 res.status(200).end();
             });
 
-            app.get('/baz', function (req, res) {
+            app.get('/bam/baz', function (req, res) {
                 t.notOk(res.locals.routeA);
-                t.notOk(res.locals.routeB);
+                t.ok(res.locals.routeB);
                 t.notOk(res.locals.routeC);
                 t.ok(res.locals.routeD);
                 res.status(200).end();
@@ -565,7 +599,7 @@ test('routes', function (t) {
             req('/bam', function () {
                 req('/bam/foo', function () {
                     req('/bam/bar', function () {
-                        req('/baz', function () {
+                        req('/bam/baz', function () {
                             t.end();
                         });
                     });
