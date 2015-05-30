@@ -22,7 +22,7 @@ var thing = require('core-util-is');
 var debug = require('debuglog')('meddleware');
 var RQ = require('./lib/rq');
 var util = require('./lib/util');
-
+var Router = require('express').Router;
 
 /**
  * Creates a middleware resolver based on the provided basedir.
@@ -180,13 +180,14 @@ module.exports = function meddleware(settings) {
     basedir = path.dirname(caller());
 
     function onmount(parent) {
-        var resolve, mountpath;
+        var resolve, mountpath, router;
 
         // Remove the sacrificial express app.
         parent._router.stack.pop();
 
         resolve = resolvery(basedir);
         mountpath = app.mountpath;
+        router = new Router();
 
         util
             .mapValues(settings, util.nameObject)
@@ -201,22 +202,14 @@ module.exports = function meddleware(settings) {
 
                 eventargs = { app: parent, config: spec };
 
-                if (thing.isArray(spec.route)) {
-                    route = spec.route.map(function (route) {
-                        return normalize(mountpath, route);
-                    });
-                } else {
-                    route = normalize(mountpath, spec.route);
-                }
-                
-                debug('registering', spec.name, 'middleware');
-
                 parent.emit('middleware:before', eventargs);
                 parent.emit('middleware:before:' + spec.name, eventargs);
-                parent.use(route, fn);
+                router.use(spec.route || '/', fn);
                 parent.emit('middleware:after:' + spec.name, eventargs);
                 parent.emit('middleware:after', eventargs);
             });
+
+        parent.use(mountpath, router);
     }
 
     app = express();
