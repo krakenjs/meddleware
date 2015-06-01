@@ -8,7 +8,7 @@
   },
   "scripts": {
     "test": "tap test/*.js",
-    "cover": "nyc npm test -- --reporter=silent && nyc report",
+    "cover": "nyc npm test && nyc report",
     "lint": "jshint -c .jshintrc index.js",
     "dryrun": "(TARBALL=`npm pack` ; tar ztvf $TARBALL ; rm -f $TARBALL)"
   },
