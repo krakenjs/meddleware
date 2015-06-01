@@ -7,8 +7,8 @@
     "test": "test"
   },
   "scripts": {
-    "test": "tape test/*.js",
-    "cover": "istanbul cover tape -- test/*.js",
+    "test": "tap test/*.js",
+    "cover": "nyc npm test -- --reporter=silent && nyc report",
     "lint": "jshint -c .jshintrc index.js",
     "dryrun": "(TARBALL=`npm pack` ; tar ztvf $TARBALL ; rm -f $TARBALL)"
   },
@@ -27,16 +27,16 @@
     "body-parser": "^1.0.2",
     "cookie-parser": "^1.0.1",
     "express": "^4.6.1",
-    "istanbul": "^0.2.7",
     "jshint": "^2.5.0",
     "morgan": "^1.0.0",
+    "nyc": "^2.2.1",
     "serve-favicon": "^2.0.1",
     "serve-static": "^1.0.4",
     "shortstop": "^1.0.1",
     "shortstop-handlers": "^1.0.0",
     "shortstop-regex": "0.0.1",
     "supertest": "^0.11.0",
-    "tape": "^2.12.3"
+    "tap": "^1.2.0"
   },
   "dependencies": {
     "caller": "0.0.1",

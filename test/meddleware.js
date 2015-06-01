@@ -1,7 +1,7 @@
 'use strict';
 
 
-var test = require('tape'),
+var test = require('tap').test,
     express = require('express'),
     request = require('supertest'),
     shortstop = require('shortstop'),
@@ -42,6 +42,8 @@ var resolve = Resolver();
 
 
 test('meddleware', function (t) {
+
+    t.plan(3);
 
     t.test('empty config', function (t) {
         var app;
@@ -99,6 +101,8 @@ test('meddleware', function (t) {
 
 test('priority', function (t) {
 
+    t.plan(1);
+
     t.test('no priority', function (t) {
         var config, app, entry, router;
 
@@ -131,6 +135,8 @@ test('priority', function (t) {
 
 
 test('module', function (t) {
+
+    t.plan(2);
 
     t.test('module not defined', function (t) {
         var config = {
@@ -177,6 +183,8 @@ test('module', function (t) {
 
 test('factories', function (t) {
 
+    t.plan(1);
+
     t.test('custom middleware factories', function (t) {
         var config, names, app, router;
 
@@ -201,6 +209,8 @@ test('factories', function (t) {
 
 
 test('enabled', function (t) {
+
+    t.plan(2);
 
     t.test('default to enabled', function (t) {
         var config, names, app, router;
@@ -260,6 +270,8 @@ test('enabled', function (t) {
 
 test('events', function (t) {
 
+    t.plan(2);
+
     t.test('before and after registration events', function (t) {
         var config, app, events = 0;
 
@@ -312,6 +324,8 @@ test('events', function (t) {
 
 test('error middleware', function (t) {
 
+    t.plan(1);
+
     t.test('arity of 4', function (t) {
         var config, app, router;
 
@@ -352,6 +366,8 @@ test('error middleware', function (t) {
 
 
 test('routes', function (t) {
+
+    t.plan(4);
 
     t.test('route-specific middleware', function (t) {
         var config, app;
@@ -614,6 +630,8 @@ test('routes', function (t) {
 
 test('composition', function (t) {
 
+    t.plan(3);
+
     t.test('parallel', function (t) {
         var config, app, time;
 
@@ -718,6 +736,9 @@ test('composition', function (t) {
 });
 
 test('use module as context in factory method', function (t) {
+
+    t.plan(1);
+
     t.test('context', function (t) {
         var config, app;
 

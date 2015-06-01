@@ -8,9 +8,6 @@ module.exports = {
         };
     },
     run: function () {
-        for (var p in this) {
-            console.log(p);
-        }
         return this.thisMustBeingFoundByMeddleware();
     }
 };
