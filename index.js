@@ -161,7 +161,7 @@ module.exports = function meddleware(settings) {
         var resolve, mountpath, router;
 
         // Remove the sacrificial express app.
-        parent._router.stack.pop();
+        (parent._router || parent.router).stack.pop();
 
         resolve = resolvery(basedir);
         mountpath = app.mountpath;
