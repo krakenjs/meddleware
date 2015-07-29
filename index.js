@@ -75,8 +75,12 @@ function resolveImpl(root, config) {
         return resolveImpl(root, { name: config });
     }
 
-    if (!config || !config.name) {
-        throw new TypeError('Module not defined.');
+    if (!config) {
+        throw new TypeError("No module section given in middleware entry");
+    }
+
+    if (!config.name) {
+        throw new TypeError('Module name not defined in middleware config: ' + JSON.stringify(config));
     }
 
     debug('loading module', config.name);
