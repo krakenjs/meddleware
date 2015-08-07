@@ -136,8 +136,6 @@ test('priority', function (t) {
 
 test('module', function (t) {
 
-    t.plan(2);
-
     t.test('module not defined', function (t) {
         var config = {
             "missing": {
@@ -153,7 +151,32 @@ test('module', function (t) {
                 app.use(meddle(config));
             } catch (e) {
                 t.ok(e instanceof TypeError, 'error is TypeError');
-                t.equal(e.message, 'Module not defined.', 'error message specifies module is not defined');
+                t.equal(e.message, 'No module section given in middleware entry', 'error message specifies module is not defined');
+                throw e;
+            }
+        });
+
+        t.end();
+    });
+
+    t.test('module name not given', function (t) {
+        var config = {
+            "missing": {
+                "enabled": true,
+                "module": {
+                    "something": "else"
+                }
+            }
+        };
+
+        t.throws(function() {
+            var app;
+            try {
+                app = express();
+                app.use(meddle(config));
+            } catch (e) {
+                t.ok(e instanceof TypeError, 'error is TypeError');
+                t.equal(e.message, 'Module name not defined in middleware config: {"something":"else"}', 'error message specifies module name is not defined');
                 throw e;
             }
         });
@@ -177,6 +200,8 @@ test('module', function (t) {
 
         t.end();
     });
+
+    t.end();
 
 });
 
