@@ -8,7 +8,7 @@
   },
   "scripts": {
     "test": "tap test/*.js",
-    "cover": "npm t -- --cov",
+    "cover": "tap --cov test/*.js",
     "lint": "jshint -c .jshintrc index.js",
     "dryrun": "(TARBALL=`npm pack` ; tar ztvf $TARBALL ; rm -f $TARBALL)"
   },
