@@ -165,11 +165,13 @@ module.exports = function meddleware(settings) {
         // Remove the sacrificial express app.
         (parent._router || parent.router).stack.pop();
 
+        var _app = Object.create(parent);
+        _app._router = null;
+        _app.lazyrouter();
+        var initCount = _app._router.stack.length;
+
         resolve = resolvery(basedir);
         mountpath = app.mountpath;
-
-        app.lazyrouter();
-        initCount = app._router.stack.length;
 
         util
             .mapValues(settings, util.nameObject)
@@ -183,21 +185,19 @@ module.exports = function meddleware(settings) {
                 }
 
                 eventargs = { app: parent, config: spec };
-
                 parent.emit('middleware:before', eventargs);
                 parent.emit('middleware:before:' + spec.name, eventargs);
-                app.use(spec.route || '/', fn);
+                _app.use(spec.route || '/', fn);
                 parent.emit('middleware:after:' + spec.name, eventargs);
                 parent.emit('middleware:after', eventargs);
             });
 
-        router = app._router;
+        router = _app._router;
         router.stack.splice(0, initCount);
-        parent.use(mountpath, router);
+        parent.use(mountpath, _app._router);
     }
 
     app = express();
-    Object.defineProperty(app, '_ephemeral', {value: true});
     app.once('mount', onmount);
     return app;
 };
