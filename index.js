@@ -22,7 +22,6 @@ var thing = require('core-util-is');
 var debug = require('debuglog')('meddleware');
 var RQ = require('./lib/rq');
 var util = require('./lib/util');
-var Router = require('express').Router;
 
 /**
  * Creates a middleware resolver based on the provided basedir.
@@ -152,7 +151,6 @@ function compare(a, b) {
     return ap - bp;
 }
 
-
 module.exports = function meddleware(settings) {
     var basedir, app;
 
@@ -162,14 +160,16 @@ module.exports = function meddleware(settings) {
     basedir = path.dirname(caller());
 
     function onmount(parent) {
-        var resolve, mountpath, router;
+        var resolve, mountpath, router, initCount;
 
         // Remove the sacrificial express app.
         (parent._router || parent.router).stack.pop();
 
         resolve = resolvery(basedir);
         mountpath = app.mountpath;
-        router = new Router();
+
+        app.lazyrouter();
+        initCount = app._router.stack.length;
 
         util
             .mapValues(settings, util.nameObject)
@@ -186,15 +186,18 @@ module.exports = function meddleware(settings) {
 
                 parent.emit('middleware:before', eventargs);
                 parent.emit('middleware:before:' + spec.name, eventargs);
-                router.use(spec.route || '/', fn);
+                app.use(spec.route || '/', fn);
                 parent.emit('middleware:after:' + spec.name, eventargs);
                 parent.emit('middleware:after', eventargs);
             });
 
+        router = app._router;
+        router.stack.splice(0, initCount);
         parent.use(mountpath, router);
     }
 
     app = express();
+    Object.defineProperty(app, '_ephemeral', {value: true});
     app.once('mount', onmount);
     return app;
 };
