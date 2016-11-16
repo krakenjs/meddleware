@@ -104,14 +104,24 @@ function resolveImpl(root, config) {
         // If modulePath was not resolved lookup with config.name for meaningful error message.
         module = require(modulePath || config.name);
 
-        // First, look for a factory method
-        factory = module[config.method];
-        if (!thing.isFunction(factory)) {
-            // Then, check if the module itself is a factory
-            factory = module;
-            if (!thing.isFunction(factory)) {
-                throw new Error('Unable to locate middleware in ' + config.name);
+        // First, look for a factory method in the config
+        if (config.method) {
+            if (module[config.method] && thing.isFunction(module[config.method])) {
+                // Straight named export
+                factory = module[config.method];
+            } else if (module.default && this.isObject(module.default)) {
+                // ES6 default export of an object with a method property which is a fn
+                factory = module.default[config.method];
             }
+        } else if (thing.isFunction(module)) {
+            // Regular module.exports = fn
+            factory = module;
+        } else if (module.default && thing.isFunction(module.default)) {
+            // ES6 export default fn
+            factory = module.default;
+        }
+        if (!thing.isFunction(factory)) {
+            throw new Error('Unable to locate middleware in ' + config.name);
         }
     }
 
