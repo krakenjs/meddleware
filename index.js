@@ -109,7 +109,7 @@ function resolveImpl(root, config) {
             if (module[config.method] && thing.isFunction(module[config.method])) {
                 // Straight named export
                 factory = module[config.method];
-            } else if (module.default && this.isObject(module.default)) {
+            } else if (module.default && thing.isObject(module.default)) {
                 // ES6 default export of an object with a method property which is a fn
                 factory = module.default[config.method];
             }
