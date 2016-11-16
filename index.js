@@ -61,6 +61,46 @@ function resolvery(basedir) {
     };
 }
 
+/**
+ * Attempts to find the best method given the config and ES5/ES6 module patterns
+ */
+function findModuleMethod(config, module) {
+    // First, look for a factory method in the config
+    if (config.method) {
+        if (module[config.method] && thing.isFunction(module[config.method])) {
+            // Straight named export
+            return module[config.method];
+        } else if (module.default && thing.isObject(module.default)) {
+            // ES6 default export of an object with a method property which is a fn
+            return module.default[config.method];
+        }
+    } else if (thing.isFunction(module)) {
+        // Regular module.exports = fn
+        return module;
+    } else if (module.default && thing.isFunction(module.default)) {
+        // ES6 export default fn
+        return module.default;
+    }
+}
+
+/**
+ * Attempts to load a node module by name
+ */
+function findModule(root, config) {
+    var modulePath;
+
+    if (!config.name) {
+        throw new TypeError('Module name not defined in middleware config: ' + JSON.stringify(config));
+    }
+
+    debug('loading module', config.name);
+
+    // Check the initial module, then try to resolve it to an absolute path and check again.
+    modulePath = util.tryResolve(config.name) || util.tryResolve(path.resolve(root, config.name));
+
+    // If modulePath was not resolved lookup with config.name for meaningful error message.
+    return require(modulePath || config.name);
+}
 
 /**
  * Attempts to locate a node module and get the specified middleware implementation.
@@ -71,7 +111,7 @@ function resolvery(basedir) {
  * @returns {Function} The middleware implementation, if located.
  */
 function resolveImpl(root, config) {
-    var modulePath, module, factory, args;
+    var module, factory, args;
 
     if (typeof config === 'function') {
         return config();
@@ -92,34 +132,9 @@ function resolveImpl(root, config) {
             config.name = factory.name;
         }
     } else {
-        if (!config.name) {
-            throw new TypeError('Module name not defined in middleware config: ' + JSON.stringify(config));
-        }
+        module = findModule(root, config);
 
-        debug('loading module', config.name);
-
-        // Check the initial module, then try to resolve it to an absolute path and check again.
-        modulePath = util.tryResolve(config.name) || util.tryResolve(path.resolve(root, config.name));
-
-        // If modulePath was not resolved lookup with config.name for meaningful error message.
-        module = require(modulePath || config.name);
-
-        // First, look for a factory method in the config
-        if (config.method) {
-            if (module[config.method] && thing.isFunction(module[config.method])) {
-                // Straight named export
-                factory = module[config.method];
-            } else if (module.default && thing.isObject(module.default)) {
-                // ES6 default export of an object with a method property which is a fn
-                factory = module.default[config.method];
-            }
-        } else if (thing.isFunction(module)) {
-            // Regular module.exports = fn
-            factory = module;
-        } else if (module.default && thing.isFunction(module.default)) {
-            // ES6 export default fn
-            factory = module.default;
-        }
+        factory = findModuleMethod(config, module);
         if (!thing.isFunction(factory)) {
             throw new Error('Unable to locate middleware in ' + config.name);
         }
