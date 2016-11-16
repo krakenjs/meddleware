@@ -174,6 +174,23 @@ test('module', function (t) {
         t.end();
     });
 
+    t.test('function as module', function (t) {
+        var config = {
+            "isFunction": {
+                "enabled": true,
+                "module": {
+                    "factory": function (one, two, three) {
+                        t.ok(one === 1 && two === 2 && three === 3, 'Arguments should match');
+                        t.end();
+                    },
+                    "arguments": [1, 2, 3]
+                }
+            }
+        };
+        var app = express();
+        app.use(meddle(config));
+    });
+
     t.end();
 
 });

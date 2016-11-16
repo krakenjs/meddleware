@@ -1,9 +1,9 @@
 meddleware
 ==========
 
-Lead Maintainer: [Jean-Charles Sisk](https://github.com/jasisk)  
+Lead Maintainer: [Jean-Charles Sisk](https://github.com/jasisk)
 
-[![Build Status](https://travis-ci.org/krakenjs/meddleware.svg?branch=v3.x)](https://travis-ci.org/krakenjs/meddleware)  
+[![Build Status](https://travis-ci.org/krakenjs/meddleware.svg?branch=v3.x)](https://travis-ci.org/krakenjs/meddleware)
 
 
 Configuration-based middleware registration for express.
@@ -103,6 +103,8 @@ to `Number.MIN_VALUE`.
     - `method` (*string*, optional) - The method on the provided module upon which invocation will create the middleware function to register. If a factory method is not provided, it defaults to the name of the current middleware being processed, and finally back to the module itself.
 
     - `arguments` (*array*, optional) - An array of arguments to pass to the middleware factory.
+
+    - `factory` (*function*, optional) - If the factory property is specified and is a function, it will be called with `arguments` to generate the middleware. In this case, `method` is ignored and `name` is optional (as it will be pulled from the factory function itself)
 
 - `route` (*string* **or** *array* **or** *regexp*, optional) - An express route against which the middleware should be registered. Can be a string or a regular expression, or an array consisting of strings and regular expressions.
 

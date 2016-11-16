@@ -61,23 +61,33 @@ function resolvery(basedir) {
     };
 }
 
+/**
+ * Attempts to find the best method given the config and ES5/ES6 module patterns
+ */
+function findModuleMethod(config, module) {
+    // First, look for a factory method in the config
+    if (config.method) {
+        if (module[config.method] && thing.isFunction(module[config.method])) {
+            // Straight named export
+            return module[config.method];
+        } else if (module.default && thing.isObject(module.default)) {
+            // ES6 default export of an object with a method property which is a fn
+            return module.default[config.method];
+        }
+    } else if (thing.isFunction(module)) {
+        // Regular module.exports = fn
+        return module;
+    } else if (module.default && thing.isFunction(module.default)) {
+        // ES6 export default fn
+        return module.default;
+    }
+}
 
 /**
- * Attempts to locate a node module and get the specified middleware implementation.
- * @param root The root directory to resolve to if file is a relative path.
- * @param config The configuration object or string describing the module and option factory method.
- * @returns {Function} The middleware implementation, if located.
+ * Attempts to load a node module by name
  */
-function resolveImpl(root, config) {
-    var modulePath, module, factory, args;
-
-    if (typeof config === 'string') {
-        return resolveImpl(root, { name: config });
-    }
-
-    if (!config) {
-        throw new TypeError("No module section given in middleware entry");
-    }
+function findModule(root, config) {
+    var modulePath;
 
     if (!config.name) {
         throw new TypeError('Module name not defined in middleware config: ' + JSON.stringify(config));
@@ -89,13 +99,42 @@ function resolveImpl(root, config) {
     modulePath = util.tryResolve(config.name) || util.tryResolve(path.resolve(root, config.name));
 
     // If modulePath was not resolved lookup with config.name for meaningful error message.
-    module = require(modulePath || config.name);
+    return require(modulePath || config.name);
+}
 
-    // First, look for a factory method
-    factory = module[config.method];
-    if (!thing.isFunction(factory)) {
-        // Then, check if the module itself is a factory
-        factory = module;
+/**
+ * Attempts to locate a node module and get the specified middleware implementation.
+ * @param root The root directory to resolve to if file is a relative path.
+ * @param config The configuration object, string or function describing the module. If the
+ * config is an object, the factory method will be defined by either 'factory' (must be a function)
+ * or resolving the name and method properties.
+ * @returns {Function} The middleware implementation, if located.
+ */
+function resolveImpl(root, config) {
+    var module, factory, args;
+
+    if (typeof config === 'function') {
+        return config();
+    }
+
+    if (typeof config === 'string') {
+        return resolveImpl(root, { name: config });
+    }
+
+    if (!config) {
+        throw new TypeError("No module section given in middleware entry");
+    }
+
+    if (config.factory && typeof config.factory === 'function') {
+        factory = config.factory;
+        if (!config.name) {
+            // if there was no name set, use the factory name
+            config.name = factory.name;
+        }
+    } else {
+        module = findModule(root, config);
+
+        factory = findModuleMethod(config, module);
         if (!thing.isFunction(factory)) {
             throw new Error('Unable to locate middleware in ' + config.name);
         }
@@ -212,7 +251,7 @@ module.exports = function meddleware(settings) {
                 } else {
                     route = normalize(mountpath, spec.route);
                 }
-                
+
                 debug('registering', spec.name, 'middleware');
 
                 parent.emit('middleware:before', eventargs);
