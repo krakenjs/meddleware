@@ -65,11 +65,17 @@ function resolvery(basedir) {
 /**
  * Attempts to locate a node module and get the specified middleware implementation.
  * @param root The root directory to resolve to if file is a relative path.
- * @param config The configuration object or string describing the module and optional factory method.
+ * @param config The configuration object, string or function describing the module. If the
+ * config is an object, the factory method will be defined by either 'factory' (must be a function)
+ * or resolving the name and method properties.
  * @returns {Function} The middleware implementation, if located.
  */
 function resolveImpl(root, config) {
     var modulePath, module, factory, args;
+
+    if (typeof config === 'function') {
+        return config();
+    }
 
     if (typeof config === 'string') {
         return resolveImpl(root, { name: config });
@@ -81,6 +87,10 @@ function resolveImpl(root, config) {
 
     if (config.factory && typeof config.factory === 'function') {
         factory = config.factory;
+        if (!config.name) {
+            // if there was no name set, use the factory name
+            config.name = factory.name;
+        }
     } else {
         if (!config.name) {
             throw new TypeError('Module name not defined in middleware config: ' + JSON.stringify(config));
