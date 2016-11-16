@@ -65,7 +65,7 @@ function resolvery(basedir) {
 /**
  * Attempts to locate a node module and get the specified middleware implementation.
  * @param root The root directory to resolve to if file is a relative path.
- * @param config The configuration object or string describing the module and option factory method.
+ * @param config The configuration object or string describing the module and optional factory method.
  * @returns {Function} The middleware implementation, if located.
  */
 function resolveImpl(root, config) {
@@ -79,25 +79,29 @@ function resolveImpl(root, config) {
         throw new TypeError("No module section given in middleware entry");
     }
 
-    if (!config.name) {
-        throw new TypeError('Module name not defined in middleware config: ' + JSON.stringify(config));
-    }
+    if (config.factory && typeof config.factory === 'function') {
+        factory = config.factory;
+    } else {
+        if (!config.name) {
+            throw new TypeError('Module name not defined in middleware config: ' + JSON.stringify(config));
+        }
 
-    debug('loading module', config.name);
+        debug('loading module', config.name);
 
-    // Check the initial module, then try to resolve it to an absolute path and check again.
-    modulePath = util.tryResolve(config.name) || util.tryResolve(path.resolve(root, config.name));
+        // Check the initial module, then try to resolve it to an absolute path and check again.
+        modulePath = util.tryResolve(config.name) || util.tryResolve(path.resolve(root, config.name));
 
-    // If modulePath was not resolved lookup with config.name for meaningful error message.
-    module = require(modulePath || config.name);
+        // If modulePath was not resolved lookup with config.name for meaningful error message.
+        module = require(modulePath || config.name);
 
-    // First, look for a factory method
-    factory = module[config.method];
-    if (!thing.isFunction(factory)) {
-        // Then, check if the module itself is a factory
-        factory = module;
+        // First, look for a factory method
+        factory = module[config.method];
         if (!thing.isFunction(factory)) {
-            throw new Error('Unable to locate middleware in ' + config.name);
+            // Then, check if the module itself is a factory
+            factory = module;
+            if (!thing.isFunction(factory)) {
+                throw new Error('Unable to locate middleware in ' + config.name);
+            }
         }
     }
 
@@ -212,7 +216,7 @@ module.exports = function meddleware(settings) {
                 } else {
                     route = normalize(mountpath, spec.route);
                 }
-                
+
                 debug('registering', spec.name, 'middleware');
 
                 parent.emit('middleware:before', eventargs);
