@@ -86,7 +86,7 @@ function resolveImpl(root, config) {
     debug('loading module', config.name);
 
     // Check the initial module, then try to resolve it to an absolute path and check again.
-    modulePath = util.tryResolve(config.name) || util.tryResolve(path.resolve(root, config.name));
+    modulePath = util.tryResolve(path.resolve(root, config.name));
 
     // If modulePath was not resolved lookup with config.name for meaningful error message.
     module = require(modulePath || config.name);
