@@ -186,7 +186,7 @@ test('module', function (t) {
         try {
             app.use(meddle(config));
         } catch (e) {
-            t.fail(e.message, 'error', e.message);
+            t.error(e, e.message);
         }
 
         t.end();
