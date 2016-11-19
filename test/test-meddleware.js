@@ -175,9 +175,6 @@ test('module', function (t) {
     });
 
     test('test local resolve edge case', function (t) {
-        var meddleware = require('../index');
-        var express = require('express');
-
         var app = express();
 
         var config = {
@@ -187,7 +184,7 @@ test('module', function (t) {
         };
 
         try {
-            app.use(meddleware(config));
+            app.use(meddle(config));
         } catch (e) {
             t.fail(e.message, 'error', e.message);
         }
