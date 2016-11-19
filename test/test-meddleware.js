@@ -174,6 +174,24 @@ test('module', function (t) {
         t.end();
     });
 
+    test('test local resolve edge case', function (t) {
+        var app = express();
+
+        var config = {
+            example: {
+                module: './rq.js'
+            }
+        };
+
+        try {
+            app.use(meddle(config));
+        } catch (e) {
+            t.error(e, e.message);
+        }
+
+        t.end();
+    });
+
     t.end();
 
 });

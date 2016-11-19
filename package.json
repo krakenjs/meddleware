@@ -7,7 +7,7 @@
     "test": "test"
   },
   "scripts": {
-    "test": "tape test/*.js",
+    "test": "tape test/test*.js",
     "cover": "istanbul cover tape -- test/*.js",
     "lint": "jshint -c .jshintrc index.js",
     "dryrun": "(TARBALL=`npm pack` ; tar ztvf $TARBALL ; rm -f $TARBALL)"
