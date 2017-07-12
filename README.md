@@ -1,7 +1,4 @@
-meddleware
-==========
-
-Lead Maintainer: [Jean-Charles Sisk](https://github.com/jasisk)  
+# meddleware
 
 [![Build Status](https://travis-ci.org/krakenjs/meddleware.svg?branch=v3.x)](https://travis-ci.org/krakenjs/meddleware)  
 
