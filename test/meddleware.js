@@ -7,6 +7,10 @@ var test = require('tape'),
     shortstop = require('shortstop'),
     handlers = require('shortstop-handlers'),
     ssRegex = require('shortstop-regex'),
+    path = require('path'),
+    util = require('util'),
+    child_process = require('child_process'),
+    exec = util.promisify(child_process.exec),
     meddle = require('../');
 
 function Resolver() {
@@ -738,6 +742,25 @@ test('use module as context in factory method', function (t) {
         });
 
         req('/', function () {
+            t.end();
+        });
+    });
+});
+
+test('test util.tryResolve', function (t) {
+    t.test('meddleware module outside the app\'s directory trying to resolve middleware module deployed inside', function (t) {
+        var testAppPath = path.join(__dirname, 'fixtures', 'apps', 'test1');
+        var options = { cwd: testAppPath };
+        exec('rm -rf node_modules/', options).then(function () {
+            return exec('npm --package-lock=false install', options);
+        }).then(function () {
+            return exec('node index.js', options);
+        }).then(function (result) {
+            t.ok(result, 'ok, got execution result');
+            t.notOk(result && result.stderr, 'ok, execution result should not have stderr');
+            t.end();
+        }).catch(function onerr(err) {
+            t.error(err);
             t.end();
         });
     });
