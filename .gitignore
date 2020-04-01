@@ -18,7 +18,9 @@ html-report
 xunit.xml
 node_modules
 npm-debug.log
+package-lock.json
 
+.vscode
 .project
 .idea
 .settings
