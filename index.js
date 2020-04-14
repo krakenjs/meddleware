@@ -212,12 +212,13 @@ module.exports = function meddleware(settings) {
                 } else {
                     route = normalize(mountpath, spec.route);
                 }
-                
+
                 debug('registering', spec.name, 'middleware');
 
                 parent.emit('middleware:before', eventargs);
                 parent.emit('middleware:before:' + spec.name, eventargs);
                 parent.use(route, fn);
+                eventargs.middleware = fn;
                 parent.emit('middleware:after:' + spec.name, eventargs);
                 parent.emit('middleware:after', eventargs);
             });
